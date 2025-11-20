@@ -11,22 +11,24 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { useTheme } from "../context/ThemeContext";
 import {
   addToFavourites,
-  addToWatchLater,
   removeFromFavourites,
-  removeFromWatchLater,
-} from "../store/librarySlice";
+  selectFavourites,
+} from "../store/favouritesSlice";
+import { addToWatchLater, removeFromWatchLater } from "../store/librarySlice";
 
 export default function DetailsScreen({ route, navigation }) {
   const { movie } = route.params;
   const dispatch = useDispatch();
+  const { theme, themeMode, toggleTheme } = useTheme();
 
   const [showFavouriteSuccess, setShowFavouriteSuccess] = useState(false);
   const [showWatchLaterSuccess, setShowWatchLaterSuccess] = useState(false);
 
   // Get favourites and watchLater from Redux state
-  const favourites = useSelector((state) => state.library.favourites);
+  const favourites = useSelector(selectFavourites);
   const watchLater = useSelector((state) => state.library.watchLater);
 
   // Check if movie is already in favourites or watch later
@@ -70,19 +72,44 @@ export default function DetailsScreen({ route, navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <StatusBar
+        barStyle={theme.colors.statusBar}
+        backgroundColor={theme.colors.background}
+      />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: theme.colors.surface,
+            borderBottomColor: theme.colors.border,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Feather name="arrow-left" size={24} color="#000" />
+          <Feather name="arrow-left" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Movie Details</Text>
-        <View style={styles.backButton} />
+        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+          Movie Details
+        </Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={toggleTheme}
+          activeOpacity={0.7}
+        >
+          <Feather
+            name={themeMode === "dark" ? "sun" : "moon"}
+            size={22}
+            color={theme.colors.text}
+          />
+        </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -95,7 +122,12 @@ export default function DetailsScreen({ route, navigation }) {
           />
           {/* Language Pill */}
           {movie.language && (
-            <View style={styles.languagePill}>
+            <View
+              style={[
+                styles.languagePill,
+                { backgroundColor: theme.colors.overlay },
+              ]}
+            >
               <Text style={styles.languageText}>{movie.language}</Text>
             </View>
           )}
@@ -111,23 +143,43 @@ export default function DetailsScreen({ route, navigation }) {
         </View>
 
         {/* Movie Info */}
-        <View style={styles.infoContainer}>
+        <View
+          style={[
+            styles.infoContainer,
+            { backgroundColor: theme.colors.background },
+          ]}
+        >
           {/* Title */}
-          <Text style={styles.title}>{movie.title}</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            {movie.title}
+          </Text>
 
           {/* Rating */}
           {movie.rating && (
             <View style={styles.ratingContainer}>
               <Feather name="star" size={20} color="#FFD93D" />
-              <Text style={styles.rating}>{movie.rating}</Text>
-              <Text style={styles.ratingOutOf}>/10</Text>
+              <Text style={[styles.rating, { color: theme.colors.text }]}>
+                {movie.rating}
+              </Text>
+              <Text
+                style={[
+                  styles.ratingOutOf,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                /10
+              </Text>
             </View>
           )}
 
           {/* Overview */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Overview</Text>
-            <Text style={styles.overview}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Overview
+            </Text>
+            <Text
+              style={[styles.overview, { color: theme.colors.textSecondary }]}
+            >
               {movie.overview ||
                 `${
                   movie.title
@@ -137,13 +189,41 @@ export default function DetailsScreen({ route, navigation }) {
 
           {/* Details */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Details</Text>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Language:</Text>
-              <Text style={styles.detailValue}>{movie.language || "N/A"}</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Details
+            </Text>
+            <View
+              style={[
+                styles.detailRow,
+                { borderBottomColor: theme.colors.border },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.detailLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Language:
+              </Text>
+              <Text style={[styles.detailValue, { color: theme.colors.text }]}>
+                {movie.language || "N/A"}
+              </Text>
             </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Status:</Text>
+            <View
+              style={[
+                styles.detailRow,
+                { borderBottomColor: theme.colors.border },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.detailLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Status:
+              </Text>
               <Text
                 style={[
                   styles.detailValue,
@@ -153,9 +233,21 @@ export default function DetailsScreen({ route, navigation }) {
                 {movie.status}
               </Text>
             </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Rating:</Text>
-              <Text style={styles.detailValue}>
+            <View
+              style={[
+                styles.detailRow,
+                { borderBottomColor: theme.colors.border },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.detailLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Rating:
+              </Text>
+              <Text style={[styles.detailValue, { color: theme.colors.text }]}>
                 {movie.rating ? `${movie.rating}/10` : "N/A"}
               </Text>
             </View>
@@ -166,6 +258,10 @@ export default function DetailsScreen({ route, navigation }) {
             <TouchableOpacity
               style={[
                 styles.actionButton,
+                {
+                  backgroundColor: theme.colors.card,
+                  shadowColor: theme.colors.shadowColor,
+                },
                 isFavourite && styles.actionButtonActive,
               ]}
               onPress={handleAddToFavourites}
@@ -173,12 +269,13 @@ export default function DetailsScreen({ route, navigation }) {
               <Feather
                 name="heart"
                 size={20}
-                color={isFavourite ? "#FF6B6B" : "#666"}
+                color={isFavourite ? "#FF6B6B" : theme.colors.textSecondary}
                 fill={isFavourite ? "#FF6B6B" : "transparent"}
               />
               <Text
                 style={[
                   styles.actionButtonText,
+                  { color: theme.colors.text },
                   isFavourite && styles.actionButtonTextActive,
                 ]}
               >
@@ -189,6 +286,10 @@ export default function DetailsScreen({ route, navigation }) {
             <TouchableOpacity
               style={[
                 styles.actionButton,
+                {
+                  backgroundColor: theme.colors.card,
+                  shadowColor: theme.colors.shadowColor,
+                },
                 isInWatchLater && styles.actionButtonActive,
               ]}
               onPress={handleAddToWatchLater}
@@ -196,12 +297,17 @@ export default function DetailsScreen({ route, navigation }) {
               <Feather
                 name="bookmark"
                 size={20}
-                color={isInWatchLater ? "#007AFF" : "#666"}
-                fill={isInWatchLater ? "#007AFF" : "transparent"}
+                color={
+                  isInWatchLater
+                    ? theme.colors.primary
+                    : theme.colors.textSecondary
+                }
+                fill={isInWatchLater ? theme.colors.primary : "transparent"}
               />
               <Text
                 style={[
                   styles.actionButtonText,
+                  { color: theme.colors.text },
                   isInWatchLater && styles.actionButtonTextActive,
                 ]}
               >
@@ -234,7 +340,6 @@ export default function DetailsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
   },
   header: {
     flexDirection: "row",
@@ -242,9 +347,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E5E5",
   },
   backButton: {
     width: 40,
@@ -255,7 +358,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#000",
   },
   posterContainer: {
     position: "relative",
@@ -274,7 +376,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   languageText: {
     fontSize: 12,
@@ -301,7 +402,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
     marginBottom: 12,
   },
   ratingContainer: {
@@ -312,12 +412,10 @@ const styles = StyleSheet.create({
   rating: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#000",
     marginLeft: 8,
   },
   ratingOutOf: {
     fontSize: 16,
-    color: "#666",
     marginLeft: 4,
   },
   section: {
@@ -326,29 +424,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#000",
     marginBottom: 12,
   },
   overview: {
     fontSize: 16,
     lineHeight: 24,
-    color: "#333",
   },
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E5E5",
   },
   detailLabel: {
     fontSize: 16,
-    color: "#666",
   },
   detailValue: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#000",
   },
   actionButtons: {
     marginTop: 8,
@@ -358,11 +451,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 12,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -370,15 +461,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   actionButtonActive: {
-    backgroundColor: "#F0F0F0",
+    opacity: 0.8,
   },
   actionButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#666",
   },
   actionButtonTextActive: {
-    color: "#000",
+    fontWeight: "700",
   },
   successMessage: {
     flexDirection: "row",

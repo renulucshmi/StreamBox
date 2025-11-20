@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   Dimensions,
   Image,
@@ -6,11 +7,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2; // 2 columns with padding
 
-const MovieCard = ({ movie, onPress }) => {
+const MovieCard = ({ movie, onPress, isFavourite, onFavouritePress }) => {
+  const { theme } = useTheme();
+
   // Get status color based on status type
   const getStatusColor = (status) => {
     switch (status) {
@@ -28,7 +32,17 @@ const MovieCard = ({ movie, onPress }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={[
+        styles.card,
+        {
+          backgroundColor: theme.colors.card,
+          shadowColor: theme.colors.shadowColor,
+        },
+      ]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       <View style={styles.posterContainer}>
         <Image
           source={{ uri: movie.poster }}
@@ -46,21 +60,51 @@ const MovieCard = ({ movie, onPress }) => {
         </View>
         {/* Language Pill */}
         {movie.language && (
-          <View style={styles.languagePill}>
+          <View
+            style={[
+              styles.languagePill,
+              { backgroundColor: theme.colors.overlay },
+            ]}
+          >
             <Text style={styles.languageText}>{movie.language}</Text>
           </View>
         )}
       </View>
       <View style={styles.cardContent}>
-        <Text style={styles.title} numberOfLines={2}>
+        <Text
+          style={[styles.title, { color: theme.colors.text }]}
+          numberOfLines={2}
+        >
           {movie.title}
         </Text>
-        {movie.rating && (
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingIcon}>⭐</Text>
-            <Text style={styles.rating}>{movie.rating}</Text>
-          </View>
-        )}
+        <View style={styles.bottomRow}>
+          {movie.rating && (
+            <View style={styles.ratingContainer}>
+              <Text style={styles.ratingIcon}>⭐</Text>
+              <Text
+                style={[styles.rating, { color: theme.colors.textSecondary }]}
+              >
+                {movie.rating}
+              </Text>
+            </View>
+          )}
+          {onFavouritePress && (
+            <TouchableOpacity
+              style={styles.favouriteButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                onFavouritePress(movie);
+              }}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons
+                name={isFavourite ? "favorite" : "favorite-border"}
+                size={20}
+                color={isFavourite ? "#FF6B6B" : theme.colors.textTertiary}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -69,10 +113,8 @@ const MovieCard = ({ movie, onPress }) => {
 const styles = StyleSheet.create({
   card: {
     width: cardWidth,
-    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     marginBottom: 16,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -116,7 +158,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
@@ -134,9 +175,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#000",
     marginBottom: 6,
     lineHeight: 18,
+  },
+  bottomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   ratingContainer: {
     flexDirection: "row",
@@ -149,7 +194,9 @@ const styles = StyleSheet.create({
   rating: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#666",
+  },
+  favouriteButton: {
+    padding: 4,
   },
 });
 

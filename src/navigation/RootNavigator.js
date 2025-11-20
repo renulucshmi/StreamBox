@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import DetailsScreen from "../screens/DetailsScreen";
 import FavouritesScreen from "../screens/FavouritesScreen";
 import HomeScreen from "../screens/HomeScreen";
@@ -16,6 +17,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const TrendingStack = createNativeStackNavigator();
+const FavouritesStack = createNativeStackNavigator();
 
 // Home Stack Navigator
 function HomeStackNavigator() {
@@ -53,17 +55,37 @@ function TrendingStackNavigator() {
   );
 }
 
+// Favourites Stack Navigator
+function FavouritesStackNavigator() {
+  return (
+    <FavouritesStack.Navigator>
+      <FavouritesStack.Screen
+        name="FavouritesMain"
+        component={FavouritesScreen}
+        options={{ headerShown: false }}
+      />
+      <FavouritesStack.Screen
+        name="Details"
+        component={DetailsScreen}
+        options={{ headerShown: false }}
+      />
+    </FavouritesStack.Navigator>
+  );
+}
+
 function MainTabs() {
+  const { theme } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: "#007AFF",
-        tabBarInactiveTintColor: "#8E8E93",
+        tabBarActiveTintColor: theme.colors.tabBarActive,
+        tabBarInactiveTintColor: theme.colors.tabBarInactive,
         tabBarStyle: {
-          backgroundColor: "#FFFFFF",
+          backgroundColor: theme.colors.tabBar,
           borderTopWidth: 1,
-          borderTopColor: "#E5E5EA",
+          borderTopColor: theme.colors.tabBarBorder,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
@@ -101,7 +123,7 @@ function MainTabs() {
       />
       <Tab.Screen
         name="Favourites"
-        component={FavouritesScreen}
+        component={FavouritesStackNavigator}
         options={{ tabBarLabel: "Favourites" }}
       />
       <Tab.Screen
@@ -115,11 +137,17 @@ function MainTabs() {
 
 export default function RootNavigator() {
   const { user, loading } = useAuth();
+  const { theme } = useTheme();
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#5B3FFF" />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -160,6 +188,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
   },
 });
