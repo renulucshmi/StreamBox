@@ -24,12 +24,19 @@ export default function LoginScreen({ navigation }) {
   const validate = () => {
     const newErrors = {};
 
+    // Email validation with regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!email.trim()) {
       newErrors.email = "Email is required";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Enter a valid email address";
     }
 
     if (!password) {
       newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);

@@ -27,20 +27,27 @@ export default function RegisterScreen({ navigation }) {
   const validate = () => {
     const newErrors = {};
 
+    // Email validation with regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Password validation regex: min 8 chars, 1 uppercase, 1 lowercase, 1 number
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
     if (!username.trim()) {
       newErrors.username = "Username is required";
     }
 
     if (!email.trim()) {
       newErrors.email = "Email is required";
-    } else if (!email.includes("@")) {
-      newErrors.email = "Please enter a valid email";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Enter a valid email address";
     }
 
     if (!password) {
       newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (!passwordRegex.test(password)) {
+      newErrors.password =
+        "Password must be 8+ chars and include uppercase, lowercase, and a number";
     }
 
     if (!confirmPassword) {
