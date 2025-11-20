@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import DetailsScreen from "../screens/DetailsScreen";
 import FavouritesScreen from "../screens/FavouritesScreen";
 import HomeScreen from "../screens/HomeScreen";
@@ -73,16 +74,18 @@ function FavouritesStackNavigator() {
 }
 
 function MainTabs() {
+  const { theme } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: "#007AFF",
-        tabBarInactiveTintColor: "#8E8E93",
+        tabBarActiveTintColor: theme.colors.tabBarActive,
+        tabBarInactiveTintColor: theme.colors.tabBarInactive,
         tabBarStyle: {
-          backgroundColor: "#FFFFFF",
+          backgroundColor: theme.colors.tabBar,
           borderTopWidth: 1,
-          borderTopColor: "#E5E5EA",
+          borderTopColor: theme.colors.tabBarBorder,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
@@ -134,11 +137,17 @@ function MainTabs() {
 
 export default function RootNavigator() {
   const { user, loading } = useAuth();
+  const { theme } = useTheme();
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#5B3FFF" />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -179,6 +188,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
   },
 });

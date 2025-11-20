@@ -3,32 +3,103 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const { theme, themeMode, toggleTheme } = useTheme();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <StatusBar
+        barStyle={theme.colors.statusBar}
+        backgroundColor={theme.colors.surface}
+      />
 
-      <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: theme.colors.surface,
+            borderBottomColor: theme.colors.borderLight,
+          },
+        ]}
+      >
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          Profile
+        </Text>
       </View>
 
       <View style={styles.content}>
-        <View style={styles.avatarContainer}>
-          <Feather name="user" size={64} color="#007AFF" />
+        <View
+          style={[
+            styles.avatarContainer,
+            { backgroundColor: theme.colors.card },
+          ]}
+        >
+          <Feather name="user" size={64} color={theme.colors.primary} />
         </View>
 
-        <Text style={styles.username}>{user?.username || "Guest"}</Text>
-        <Text style={styles.email}>{user?.email || "guest@streambox.com"}</Text>
+        <Text style={[styles.username, { color: theme.colors.text }]}>
+          {user?.username || "Guest"}
+        </Text>
+        <Text style={[styles.email, { color: theme.colors.textSecondary }]}>
+          {user?.email || "guest@streambox.com"}
+        </Text>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        {/* Settings Section */}
+        <View style={styles.settingsSection}>
+          <Text
+            style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}
+          >
+            Settings
+          </Text>
+
+          {/* Dark Mode Toggle */}
+          <View
+            style={[
+              styles.settingRow,
+              {
+                backgroundColor: theme.colors.card,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
+          >
+            <View style={styles.settingLeft}>
+              <Feather
+                name={themeMode === "dark" ? "moon" : "sun"}
+                size={20}
+                color={theme.colors.text}
+              />
+              <Text style={[styles.settingText, { color: theme.colors.text }]}>
+                Dark Mode
+              </Text>
+            </View>
+            <Switch
+              value={themeMode === "dark"}
+              onValueChange={toggleTheme}
+              trackColor={{
+                false: "#D1D1D6",
+                true: theme.colors.primary,
+              }}
+              thumbColor="#FFFFFF"
+              ios_backgroundColor="#D1D1D6"
+            />
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={[styles.logoutButton, { backgroundColor: theme.colors.error }]}
+          onPress={logout}
+        >
           <Feather name="log-out" size={20} color="#fff" />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
@@ -40,18 +111,15 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
   },
   content: {
     flex: 1,
@@ -62,7 +130,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#f0f0f0",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -70,18 +137,47 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#000",
     marginBottom: 4,
   },
   email: {
     fontSize: 16,
-    color: "#666",
     marginBottom: 32,
+  },
+  settingsSection: {
+    width: "90%",
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  settingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+  },
+  settingLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  settingText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#007AFF",
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 12,

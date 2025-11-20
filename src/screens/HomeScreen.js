@@ -9,10 +9,12 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import MovieCard from "../components/MovieCard";
+import { useTheme } from "../context/ThemeContext";
 import {
   addToFavourites,
   removeFromFavourites,
@@ -164,6 +166,7 @@ const fetchMovies = async () => {
 export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
   const favourites = useSelector(selectFavourites);
+  const { theme, themeMode, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -216,45 +219,88 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <StatusBar
+        barStyle={theme.colors.statusBar}
+        backgroundColor={theme.colors.surface}
+      />
 
       {/* Top Bar */}
-      <View style={styles.topBar}>
-        <Text style={styles.appName}>StreamBox</Text>
+      <View
+        style={[
+          styles.topBar,
+          {
+            backgroundColor: theme.colors.surface,
+            borderBottomColor: theme.colors.border,
+          },
+        ]}
+      >
+        <View style={styles.topBarLeft} />
+        <Text style={[styles.appName, { color: theme.colors.text }]}>
+          StreamBox
+        </Text>
+        <TouchableOpacity
+          style={styles.themeToggleButton}
+          onPress={toggleTheme}
+          activeOpacity={0.7}
+        >
+          <Feather
+            name={themeMode === "dark" ? "sun" : "moon"}
+            size={24}
+            color={theme.colors.text}
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
+      <View
+        style={[
+          styles.searchContainer,
+          {
+            backgroundColor: theme.colors.card,
+            shadowColor: theme.colors.shadowColor,
+          },
+        ]}
+      >
         <Feather
           name="search"
           size={20}
-          color="#666"
+          color={theme.colors.textSecondary}
           style={styles.searchIcon}
         />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: theme.colors.text }]}
           placeholder="Search movies…"
-          placeholderTextColor="#999"
+          placeholderTextColor={theme.colors.searchPlaceholder}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
       </View>
 
       {/* Language Filter Dropdown */}
-      <View style={styles.filterContainer}>
+      <View
+        style={[
+          styles.filterContainer,
+          {
+            backgroundColor: theme.colors.card,
+            shadowColor: theme.colors.shadowColor,
+          },
+        ]}
+      >
         <Feather
           name="globe"
           size={18}
-          color="#666"
+          color={theme.colors.textSecondary}
           style={styles.filterIcon}
         />
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={languageFilter}
             onValueChange={(itemValue) => setLanguageFilter(itemValue)}
-            style={styles.picker}
-            dropdownIconColor="#007AFF"
+            style={[styles.picker, { color: theme.colors.text }]}
+            dropdownIconColor={theme.colors.primary}
           >
             <Picker.Item label="All Languages" value="all" />
             <Picker.Item label="English" value="english" />
@@ -268,7 +314,7 @@ export default function HomeScreen({ navigation }) {
 
       {/* Section Heading */}
       <View style={styles.sectionHeaderContainer}>
-        <Text style={styles.sectionTitle}>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
           {searchQuery
             ? "Search Results"
             : languageFilter === "all"
@@ -277,7 +323,12 @@ export default function HomeScreen({ navigation }) {
                 languageFilter.charAt(0).toUpperCase() + languageFilter.slice(1)
               } Movies`}
         </Text>
-        <Text style={styles.sectionSubtitle}>
+        <Text
+          style={[
+            styles.sectionSubtitle,
+            { color: theme.colors.textSecondary },
+          ]}
+        >
           {filteredMovies.length}{" "}
           {filteredMovies.length === 1 ? "movie" : "movies"}
         </Text>
@@ -286,8 +337,12 @@ export default function HomeScreen({ navigation }) {
       {/* Movie List */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading movies...</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text
+            style={[styles.loadingText, { color: theme.colors.textSecondary }]}
+          >
+            Loading movies...
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -307,11 +362,16 @@ export default function HomeScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Feather name="film" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>
+              <Feather name="film" size={64} color={theme.colors.emptyIcon} />
+              <Text style={[styles.emptyText, { color: theme.colors.text }]}>
                 {searchQuery ? "No movies found" : "No movies available"}
               </Text>
-              <Text style={styles.emptySubtext}>
+              <Text
+                style={[
+                  styles.emptySubtext,
+                  { color: theme.colors.textTertiary },
+                ]}
+              >
                 {searchQuery
                   ? "Try a different search term"
                   : "Check back later"}
@@ -327,34 +387,37 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
   },
   topBar: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E5E5",
+  },
+  topBarLeft: {
+    width: 40,
   },
   appName: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
+  },
+  themeToggleButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     marginHorizontal: 16,
     marginTop: 16,
     marginBottom: 12,
     height: 48,
     paddingHorizontal: 16,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -366,19 +429,16 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: "#000",
   },
   filterContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     marginHorizontal: 16,
     marginTop: 12,
     marginBottom: 8,
     paddingHorizontal: 16,
     paddingVertical: 4,
     borderRadius: 12,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -394,7 +454,6 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
-    color: "#000",
     fontSize: 15,
   },
   sectionHeaderContainer: {
@@ -404,12 +463,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#000",
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: "#666",
   },
   movieList: {
     paddingHorizontal: 8,
@@ -429,7 +486,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#666",
   },
   emptyContainer: {
     flex: 1,
@@ -441,11 +497,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     fontWeight: "600",
-    color: "#333",
   },
   emptySubtext: {
     marginTop: 8,
     fontSize: 14,
-    color: "#999",
   },
 });

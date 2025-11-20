@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { useTheme } from "../context/ThemeContext";
 import {
   removeFromFavourites,
   selectFavourites,
@@ -22,6 +23,7 @@ const cardWidth = (width - 48) / 2; // 2 columns with padding
 export default function FavouritesScreen({ navigation }) {
   const dispatch = useDispatch();
   const favourites = useSelector(selectFavourites);
+  const { theme, themeMode, toggleTheme } = useTheme();
 
   const handleRemoveFromFavourites = (movieId) => {
     dispatch(removeFromFavourites(movieId));
@@ -50,7 +52,13 @@ export default function FavouritesScreen({ navigation }) {
   const renderMovieCard = ({ item: movie }) => (
     <View style={styles.cardWrapper}>
       <TouchableOpacity
-        style={styles.card}
+        style={[
+          styles.card,
+          {
+            backgroundColor: theme.colors.card,
+            shadowColor: theme.colors.shadowColor,
+          },
+        ]}
         onPress={() => handleMoviePress(movie)}
         activeOpacity={0.7}
       >
@@ -71,7 +79,12 @@ export default function FavouritesScreen({ navigation }) {
           </View>
           {/* Language Pill */}
           {movie.language && (
-            <View style={styles.languagePill}>
+            <View
+              style={[
+                styles.languagePill,
+                { backgroundColor: theme.colors.overlay },
+              ]}
+            >
               <Text style={styles.languageText}>{movie.language}</Text>
             </View>
           )}
@@ -85,13 +98,20 @@ export default function FavouritesScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.cardContent}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text
+            style={[styles.title, { color: theme.colors.text }]}
+            numberOfLines={2}
+          >
             {movie.title}
           </Text>
           {movie.rating && (
             <View style={styles.ratingContainer}>
               <Text style={styles.ratingIcon}>⭐</Text>
-              <Text style={styles.rating}>{movie.rating}</Text>
+              <Text
+                style={[styles.rating, { color: theme.colors.textSecondary }]}
+              >
+                {movie.rating}
+              </Text>
             </View>
           )}
         </View>
@@ -101,25 +121,56 @@ export default function FavouritesScreen({ navigation }) {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Feather name="heart" size={64} color="#E5E5E5" />
-      <Text style={styles.emptyTitle}>No Favourites Yet</Text>
-      <Text style={styles.emptySubtitle}>
+      <Feather name="heart" size={64} color={theme.colors.emptyIcon} />
+      <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+        No Favourites Yet
+      </Text>
+      <Text
+        style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}
+      >
         Movies and shows you favourite will appear here
       </Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.surface }]}
+    >
+      <StatusBar
+        barStyle={theme.colors.statusBar}
+        backgroundColor={theme.colors.surface}
+      />
 
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Favourites</Text>
-        {favourites.length > 0 && (
-          <View style={styles.countBadge}>
-            <Text style={styles.countText}>{favourites.length}</Text>
-          </View>
-        )}
+      <View
+        style={[styles.header, { borderBottomColor: theme.colors.borderLight }]}
+      >
+        <View style={styles.headerLeft}>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+            My Favourites
+          </Text>
+          {favourites.length > 0 && (
+            <View
+              style={[
+                styles.countBadge,
+                { backgroundColor: theme.colors.primary },
+              ]}
+            >
+              <Text style={styles.countText}>{favourites.length}</Text>
+            </View>
+          )}
+        </View>
+        <TouchableOpacity
+          style={styles.themeToggleButton}
+          onPress={toggleTheme}
+          activeOpacity={0.7}
+        >
+          <Feather
+            name={themeMode === "dark" ? "sun" : "moon"}
+            size={22}
+            color={theme.colors.text}
+          />
+        </TouchableOpacity>
       </View>
 
       {favourites.length === 0 ? (
@@ -142,23 +193,31 @@ export default function FavouritesScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#000",
+  },
+  themeToggleButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   countBadge: {
-    backgroundColor: "#007AFF",
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -180,9 +239,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -226,7 +283,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
@@ -260,7 +316,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#000",
     marginBottom: 6,
     lineHeight: 18,
   },
@@ -275,7 +330,6 @@ const styles = StyleSheet.create({
   rating: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#666",
   },
   emptyContainer: {
     flex: 1,
@@ -286,13 +340,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#000",
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 16,
-    color: "#666",
     textAlign: "center",
   },
 });

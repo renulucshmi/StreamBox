@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import MovieCard from "../components/MovieCard";
 import SectionHeader from "../components/SectionHeader";
+import { useTheme } from "../context/ThemeContext";
 import {
   addToFavourites,
   removeFromFavourites,
@@ -121,6 +122,7 @@ const TRENDING_DATA = [
 export default function TrendingScreen({ navigation }) {
   const dispatch = useDispatch();
   const favourites = useSelector(selectFavourites);
+  const { theme, themeMode, toggleTheme } = useTheme();
   const [filter, setFilter] = useState("all"); // all, english, korean, spanish
 
   // Filter data based on selected language
@@ -166,29 +168,44 @@ export default function TrendingScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <StatusBar
+        barStyle={theme.colors.statusBar}
+        backgroundColor={theme.colors.surface}
+      />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
         <SectionHeader title="Trending Now" />
-        <Text style={styles.subtitle}>Most popular movies this week</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+          Most popular movies this week
+        </Text>
       </View>
 
       {/* Language Filter Dropdown */}
-      <View style={styles.filterContainer}>
+      <View
+        style={[
+          styles.filterContainer,
+          {
+            backgroundColor: theme.colors.card,
+            shadowColor: theme.colors.shadowColor,
+          },
+        ]}
+      >
         <Feather
           name="globe"
           size={18}
-          color="#666"
+          color={theme.colors.textSecondary}
           style={styles.filterIcon}
         />
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={filter}
             onValueChange={(itemValue) => setFilter(itemValue)}
-            style={styles.picker}
-            dropdownIconColor="#007AFF"
+            style={[styles.picker, { color: theme.colors.text }]}
+            dropdownIconColor={theme.colors.primary}
           >
             <Picker.Item label="All Languages" value="all" />
             <Picker.Item label="English" value="english" />
@@ -210,7 +227,11 @@ export default function TrendingScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No {filter} available</Text>
+            <Text
+              style={[styles.emptyText, { color: theme.colors.textTertiary }]}
+            >
+              No {filter} available
+            </Text>
           </View>
         }
       />
@@ -221,30 +242,40 @@ export default function TrendingScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
   },
   header: {
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 8,
-    backgroundColor: "#FFFFFF",
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  themeToggleButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
   },
   subtitle: {
     fontSize: 14,
-    color: "#666",
     marginTop: 4,
   },
   filterContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     marginHorizontal: 16,
     marginTop: 12,
     marginBottom: 12,
     paddingHorizontal: 16,
     paddingVertical: 4,
     borderRadius: 12,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
@@ -260,7 +291,6 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
-    color: "#000",
     fontSize: 15,
   },
   gridContainer: {
@@ -283,7 +313,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: "#999",
     textAlign: "center",
   },
 });
