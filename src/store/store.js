@@ -1,21 +1,30 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
+import favouritesReducer from "./favouritesSlice";
 import libraryReducer from "./librarySlice";
 
-// Redux Persist configuration
-const persistConfig = {
-  key: "root",
+// Redux Persist configuration for library
+const libraryPersistConfig = {
+  key: "library",
   storage: AsyncStorage,
-  whitelist: ["library"], // Only persist library slice
+  whitelist: ["watchLater"], // Only persist watchLater in library
 };
 
-const persistedReducer = persistReducer(persistConfig, libraryReducer);
+// Redux Persist configuration for favourites
+const favouritesPersistConfig = {
+  key: "favourites",
+  storage: AsyncStorage,
+  whitelist: ["favourites"], // Persist favourites
+};
+
+const rootReducer = combineReducers({
+  library: persistReducer(libraryPersistConfig, libraryReducer),
+  favourites: persistReducer(favouritesPersistConfig, favouritesReducer),
+});
 
 export const store = configureStore({
-  reducer: {
-    library: persistedReducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

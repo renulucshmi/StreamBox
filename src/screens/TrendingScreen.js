@@ -9,8 +9,14 @@ import {
   Text,
   View,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import MovieCard from "../components/MovieCard";
 import SectionHeader from "../components/SectionHeader";
+import {
+  addToFavourites,
+  removeFromFavourites,
+  selectFavourites,
+} from "../store/favouritesSlice";
 
 // Extended dummy data for trending movies and series with language filters
 const TRENDING_DATA = [
@@ -113,6 +119,8 @@ const TRENDING_DATA = [
 ];
 
 export default function TrendingScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const favourites = useSelector(selectFavourites);
   const [filter, setFilter] = useState("all"); // all, english, korean, spanish
 
   // Filter data based on selected language
@@ -131,10 +139,28 @@ export default function TrendingScreen({ navigation }) {
     navigation.navigate("Details", { movie });
   };
 
+  const handleFavouritePress = (movie) => {
+    const isFavourite = favourites.some((item) => item.id === movie.id);
+    if (isFavourite) {
+      dispatch(removeFromFavourites(movie.id));
+    } else {
+      dispatch(addToFavourites(movie));
+    }
+  };
+
+  const isFavourite = (movieId) => {
+    return favourites.some((item) => item.id === movieId);
+  };
+
   const renderMovieItem = ({ item, index }) => {
     return (
       <View style={styles.gridItem}>
-        <MovieCard movie={item} onPress={() => handleMoviePress(item)} />
+        <MovieCard
+          movie={item}
+          onPress={() => handleMoviePress(item)}
+          isFavourite={isFavourite(item.id)}
+          onFavouritePress={handleFavouritePress}
+        />
       </View>
     );
   };

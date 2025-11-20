@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   Dimensions,
   Image,
@@ -10,7 +11,7 @@ import {
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2; // 2 columns with padding
 
-const MovieCard = ({ movie, onPress }) => {
+const MovieCard = ({ movie, onPress, isFavourite, onFavouritePress }) => {
   // Get status color based on status type
   const getStatusColor = (status) => {
     switch (status) {
@@ -55,12 +56,30 @@ const MovieCard = ({ movie, onPress }) => {
         <Text style={styles.title} numberOfLines={2}>
           {movie.title}
         </Text>
-        {movie.rating && (
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingIcon}>⭐</Text>
-            <Text style={styles.rating}>{movie.rating}</Text>
-          </View>
-        )}
+        <View style={styles.bottomRow}>
+          {movie.rating && (
+            <View style={styles.ratingContainer}>
+              <Text style={styles.ratingIcon}>⭐</Text>
+              <Text style={styles.rating}>{movie.rating}</Text>
+            </View>
+          )}
+          {onFavouritePress && (
+            <TouchableOpacity
+              style={styles.favouriteButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                onFavouritePress(movie);
+              }}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons
+                name={isFavourite ? "favorite" : "favorite-border"}
+                size={20}
+                color={isFavourite ? "#FF6B6B" : "#999"}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -138,6 +157,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     lineHeight: 18,
   },
+  bottomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   ratingContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -150,6 +174,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     color: "#666",
+  },
+  favouriteButton: {
+    padding: 4,
   },
 });
 

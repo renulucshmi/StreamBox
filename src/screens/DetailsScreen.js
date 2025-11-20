@@ -13,10 +13,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToFavourites,
-  addToWatchLater,
   removeFromFavourites,
-  removeFromWatchLater,
-} from "../store/librarySlice";
+  selectFavourites,
+} from "../store/favouritesSlice";
+import { addToWatchLater, removeFromWatchLater } from "../store/librarySlice";
 
 export default function DetailsScreen({ route, navigation }) {
   const { movie } = route.params;
@@ -26,7 +26,7 @@ export default function DetailsScreen({ route, navigation }) {
   const [showWatchLaterSuccess, setShowWatchLaterSuccess] = useState(false);
 
   // Get favourites and watchLater from Redux state
-  const favourites = useSelector((state) => state.library.favourites);
+  const favourites = useSelector(selectFavourites);
   const watchLater = useSelector((state) => state.library.watchLater);
 
   // Check if movie is already in favourites or watch later

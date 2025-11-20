@@ -11,7 +11,13 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import MovieCard from "../components/MovieCard";
+import {
+  addToFavourites,
+  removeFromFavourites,
+  selectFavourites,
+} from "../store/favouritesSlice";
 
 // Dummy TMDB-style movie data with language filters
 const DUMMY_MOVIES_DATA = [
@@ -156,6 +162,8 @@ const fetchMovies = async () => {
 };
 
 export default function HomeScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const favourites = useSelector(selectFavourites);
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -192,6 +200,19 @@ export default function HomeScreen({ navigation }) {
   const handleMoviePress = (movie) => {
     // Navigate to Details screen with movie data
     navigation.navigate("Details", { movie });
+  };
+
+  const handleFavouritePress = (movie) => {
+    const isFavourite = favourites.some((item) => item.id === movie.id);
+    if (isFavourite) {
+      dispatch(removeFromFavourites(movie.id));
+    } else {
+      dispatch(addToFavourites(movie));
+    }
+  };
+
+  const isFavourite = (movieId) => {
+    return favourites.some((item) => item.id === movieId);
   };
 
   return (
@@ -273,7 +294,12 @@ export default function HomeScreen({ navigation }) {
           data={filteredMovies}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <MovieCard movie={item} onPress={() => handleMoviePress(item)} />
+            <MovieCard
+              movie={item}
+              onPress={() => handleMoviePress(item)}
+              isFavourite={isFavourite(item.id)}
+              onFavouritePress={handleFavouritePress}
+            />
           )}
           numColumns={2}
           contentContainerStyle={styles.movieList}

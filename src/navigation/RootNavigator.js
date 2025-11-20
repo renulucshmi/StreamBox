@@ -16,6 +16,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const TrendingStack = createNativeStackNavigator();
+const FavouritesStack = createNativeStackNavigator();
 
 // Home Stack Navigator
 function HomeStackNavigator() {
@@ -50,6 +51,24 @@ function TrendingStackNavigator() {
         options={{ headerShown: false }}
       />
     </TrendingStack.Navigator>
+  );
+}
+
+// Favourites Stack Navigator
+function FavouritesStackNavigator() {
+  return (
+    <FavouritesStack.Navigator>
+      <FavouritesStack.Screen
+        name="FavouritesMain"
+        component={FavouritesScreen}
+        options={{ headerShown: false }}
+      />
+      <FavouritesStack.Screen
+        name="Details"
+        component={DetailsScreen}
+        options={{ headerShown: false }}
+      />
+    </FavouritesStack.Navigator>
   );
 }
 
@@ -101,7 +120,7 @@ function MainTabs() {
       />
       <Tab.Screen
         name="Favourites"
-        component={FavouritesScreen}
+        component={FavouritesStackNavigator}
         options={{ tabBarLabel: "Favourites" }}
       />
       <Tab.Screen
