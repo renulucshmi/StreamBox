@@ -44,6 +44,12 @@ const MovieCard = ({ movie, onPress }) => {
         >
           <Text style={styles.statusText}>{movie.status}</Text>
         </View>
+        {/* Language Pill */}
+        {movie.language && (
+          <View style={styles.languagePill}>
+            <Text style={styles.languageText}>{movie.language}</Text>
+          </View>
+        )}
       </View>
       <View style={styles.cardContent}>
         <Text style={styles.title} numberOfLines={2}>
@@ -102,6 +108,25 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     textTransform: "uppercase",
     letterSpacing: 0.5,
+  },
+  languagePill: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  languageText: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   cardContent: {
     padding: 12,

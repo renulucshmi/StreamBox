@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,7 +13,7 @@ import {
 } from "react-native";
 import MovieCard from "../components/MovieCard";
 
-// Dummy TMDB-style movie data with different statuses
+// Dummy TMDB-style movie data with language filters
 const DUMMY_MOVIES_DATA = [
   {
     id: "1",
@@ -20,6 +21,7 @@ const DUMMY_MOVIES_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     status: "Popular",
     rating: 9.0,
+    language: "English",
   },
   {
     id: "2",
@@ -27,13 +29,15 @@ const DUMMY_MOVIES_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
     status: "Trending",
     rating: 8.8,
+    language: "English",
   },
   {
     id: "3",
-    title: "Interstellar",
-    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+    title: "Parasite",
+    poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
     status: "Top Rated",
-    rating: 8.6,
+    rating: 8.5,
+    language: "Korean",
   },
   {
     id: "4",
@@ -41,13 +45,15 @@ const DUMMY_MOVIES_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
     status: "Popular",
     rating: 8.7,
+    language: "English",
   },
   {
     id: "5",
-    title: "Pulp Fiction",
-    poster: "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
-    status: "Top Rated",
-    rating: 8.9,
+    title: "Amélie",
+    poster: "https://image.tmdb.org/t/p/w500/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg",
+    status: "Popular",
+    rating: 8.3,
+    language: "French",
   },
   {
     id: "6",
@@ -55,13 +61,15 @@ const DUMMY_MOVIES_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
     status: "Trending",
     rating: 8.8,
+    language: "English",
   },
   {
     id: "7",
-    title: "Forrest Gump",
-    poster: "https://image.tmdb.org/t/p/w500/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
+    title: "Money Heist (La Casa de Papel)",
+    poster: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
     status: "Popular",
-    rating: 8.8,
+    rating: 8.2,
+    language: "Spanish",
   },
   {
     id: "8",
@@ -69,20 +77,23 @@ const DUMMY_MOVIES_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
     status: "Top Rated",
     rating: 9.2,
+    language: "English",
   },
   {
     id: "9",
-    title: "The Shawshank Redemption",
-    poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+    title: "Oldboy",
+    poster: "https://image.tmdb.org/t/p/w500/pWDtjs568ZfOTMbURQBYuT4Qqu8.jpg",
     status: "Top Rated",
-    rating: 9.3,
+    rating: 8.4,
+    language: "Korean",
   },
   {
     id: "10",
-    title: "Parasite",
-    poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    title: "Squid Game",
+    poster: "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg",
     status: "Trending",
-    rating: 8.5,
+    rating: 8.0,
+    language: "Korean",
   },
   {
     id: "11",
@@ -90,20 +101,23 @@ const DUMMY_MOVIES_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
     status: "Popular",
     rating: 8.4,
+    language: "English",
   },
   {
     id: "12",
-    title: "Spider-Man: No Way Home",
-    poster: "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
-    status: "Upcoming",
-    rating: 8.2,
+    title: "Dark",
+    poster: "https://image.tmdb.org/t/p/w500/5J8bKRQkw5R0oRh2UWA2JmMFS2U.jpg",
+    status: "Trending",
+    rating: 8.7,
+    language: "German",
   },
   {
     id: "13",
-    title: "Dune: Part Two",
-    poster: "https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg",
-    status: "Upcoming",
-    rating: 8.7,
+    title: "Narcos",
+    poster: "https://image.tmdb.org/t/p/w500/rTmal9fDbwh5F0waol2hq35U4ah.jpg",
+    status: "Popular",
+    rating: 8.8,
+    language: "Spanish",
   },
   {
     id: "14",
@@ -111,20 +125,23 @@ const DUMMY_MOVIES_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
     status: "Trending",
     rating: 8.6,
+    language: "English",
   },
   {
     id: "15",
-    title: "Barbie",
-    poster: "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg",
+    title: "Intouchables",
+    poster: "https://image.tmdb.org/t/p/w500/4mFsNQwbD0F237Tx7gAPotd0nbJ.jpg",
     status: "Popular",
-    rating: 7.2,
+    rating: 8.5,
+    language: "French",
   },
   {
     id: "16",
-    title: "The Batman",
-    poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
-    status: "Upcoming",
-    rating: 7.8,
+    title: "Train to Busan",
+    poster: "https://image.tmdb.org/t/p/w500/5mCiMdlZjJ1CNoXKRsWPCLAzcCj.jpg",
+    status: "Trending",
+    rating: 7.6,
+    language: "Korean",
   },
 ];
 
@@ -142,6 +159,7 @@ export default function HomeScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [languageFilter, setLanguageFilter] = useState("all");
 
   // Fetch movies on component mount
   useEffect(() => {
@@ -160,10 +178,16 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // Filter movies based on search query
-  const filteredMovies = movies.filter((movie) =>
-    movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter movies based on search query and language
+  const filteredMovies = movies.filter((movie) => {
+    const matchesSearch = movie.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesLanguage =
+      languageFilter === "all" ||
+      movie.language.toLowerCase() === languageFilter.toLowerCase();
+    return matchesSearch && matchesLanguage;
+  });
 
   const handleMoviePress = (movie) => {
     // Navigate to detail screen (will be implemented later)
@@ -197,10 +221,41 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
+      {/* Language Filter Dropdown */}
+      <View style={styles.filterContainer}>
+        <Feather
+          name="globe"
+          size={18}
+          color="#666"
+          style={styles.filterIcon}
+        />
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={languageFilter}
+            onValueChange={(itemValue) => setLanguageFilter(itemValue)}
+            style={styles.picker}
+            dropdownIconColor="#007AFF"
+          >
+            <Picker.Item label="All Languages" value="all" />
+            <Picker.Item label="English" value="english" />
+            <Picker.Item label="Korean" value="korean" />
+            <Picker.Item label="Spanish" value="spanish" />
+            <Picker.Item label="French" value="french" />
+            <Picker.Item label="German" value="german" />
+          </Picker>
+        </View>
+      </View>
+
       {/* Section Heading */}
       <View style={styles.sectionHeaderContainer}>
         <Text style={styles.sectionTitle}>
-          {searchQuery ? "Search Results" : "All Movies"}
+          {searchQuery
+            ? "Search Results"
+            : languageFilter === "all"
+            ? "All Movies"
+            : `${
+                languageFilter.charAt(0).toUpperCase() + languageFilter.slice(1)
+              } Movies`}
         </Text>
         <Text style={styles.sectionSubtitle}>
           {filteredMovies.length}{" "}
@@ -287,6 +342,35 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#000",
+  },
+  filterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+    minHeight: 50,
+  },
+  filterIcon: {
+    marginRight: 8,
+  },
+  pickerWrapper: {
+    flex: 1,
+    marginLeft: -8,
+  },
+  picker: {
+    height: 50,
+    color: "#000",
+    fontSize: 15,
   },
   sectionHeaderContainer: {
     paddingHorizontal: 16,

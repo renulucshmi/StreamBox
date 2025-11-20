@@ -1,3 +1,5 @@
+import { Feather } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import { useState } from "react";
 import {
   FlatList,
@@ -5,13 +7,12 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import MovieCard from "../components/MovieCard";
 import SectionHeader from "../components/SectionHeader";
 
-// Extended dummy data for trending movies and series with real TMDB posters
+// Extended dummy data for trending movies and series with language filters
 const TRENDING_DATA = [
   {
     id: "1",
@@ -19,7 +20,7 @@ const TRENDING_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     rating: 9.0,
     status: "Trending",
-    type: "movie",
+    language: "English",
   },
   {
     id: "2",
@@ -27,103 +28,101 @@ const TRENDING_DATA = [
     poster: "https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
     rating: 8.8,
     status: "Trending",
-    type: "movie",
+    language: "English",
   },
   {
     id: "3",
-    title: "Breaking Bad",
-    poster: "https://image.tmdb.org/t/p/w500/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg",
-    rating: 9.5,
+    title: "Parasite",
+    poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    rating: 8.5,
     status: "Top Rated",
-    type: "series",
+    language: "Korean",
   },
   {
     id: "4",
-    title: "The Matrix",
-    poster: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
-    rating: 8.7,
-    status: "Trending",
-    type: "movie",
+    title: "Money Heist",
+    poster: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
+    rating: 8.2,
+    status: "Popular",
+    language: "Spanish",
   },
   {
     id: "5",
-    title: "Stranger Things",
-    poster: "https://image.tmdb.org/t/p/w500/x2LSRK2Cm7MZhjluni1msVJ3wDF.jpg",
-    rating: 8.7,
+    title: "Amélie",
+    poster: "https://image.tmdb.org/t/p/w500/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg",
+    rating: 8.3,
     status: "Popular",
-    type: "series",
+    language: "French",
   },
   {
     id: "6",
+    title: "Squid Game",
+    poster: "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg",
+    rating: 8.0,
+    status: "Trending",
+    language: "Korean",
+  },
+  {
+    id: "7",
     title: "Fight Club",
     poster: "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
     rating: 8.8,
     status: "Trending",
-    type: "movie",
-  },
-  {
-    id: "7",
-    title: "Game of Thrones",
-    poster: "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
-    rating: 9.2,
-    status: "Popular",
-    type: "series",
+    language: "English",
   },
   {
     id: "8",
+    title: "Narcos",
+    poster: "https://image.tmdb.org/t/p/w500/rTmal9fDbwh5F0waol2hq35U4ah.jpg",
+    rating: 8.8,
+    status: "Popular",
+    language: "Spanish",
+  },
+  {
+    id: "9",
     title: "The Shawshank Redemption",
     poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
     rating: 9.3,
     status: "Top Rated",
-    type: "movie",
-  },
-  {
-    id: "9",
-    title: "The Last of Us",
-    poster: "https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg",
-    rating: 8.8,
-    status: "Trending",
-    type: "series",
+    language: "English",
   },
   {
     id: "10",
-    title: "Goodfellas",
-    poster: "https://image.tmdb.org/t/p/w500/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg",
+    title: "Dark",
+    poster: "https://image.tmdb.org/t/p/w500/5J8bKRQkw5R0oRh2UWA2JmMFS2U.jpg",
     rating: 8.7,
     status: "Popular",
-    type: "movie",
+    language: "German",
   },
   {
     id: "11",
-    title: "The Crown",
-    poster: "https://image.tmdb.org/t/p/w500/1M876KPjulVwppEpldhdc8V4o68.jpg",
-    rating: 8.6,
-    status: "Popular",
-    type: "series",
-  },
-  {
-    id: "12",
     title: "Interstellar",
     poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
     rating: 8.7,
     status: "Trending",
-    type: "movie",
+    language: "English",
+  },
+  {
+    id: "12",
+    title: "Train to Busan",
+    poster: "https://image.tmdb.org/t/p/w500/5mCiMdlZjJ1CNoXKRsWPCLAzcCj.jpg",
+    rating: 7.6,
+    status: "Popular",
+    language: "Korean",
   },
 ];
 
 export default function TrendingScreen() {
-  const [filter, setFilter] = useState("all"); // all, movies, series
+  const [filter, setFilter] = useState("all"); // all, english, korean, spanish
 
-  // Filter data based on selected filter
+  // Filter data based on selected language
   const getFilteredData = () => {
     if (filter === "all") {
       return TRENDING_DATA;
-    } else if (filter === "movies") {
-      return TRENDING_DATA.filter((item) => item.type === "movie");
-    } else if (filter === "series") {
-      return TRENDING_DATA.filter((item) => item.type === "series");
     }
-    return TRENDING_DATA;
+    return TRENDING_DATA.filter(
+      (item) => item.language.toLowerCase() === filter.toLowerCase()
+    );
   };
 
   const filteredData = getFilteredData();
@@ -150,56 +149,28 @@ export default function TrendingScreen() {
         <Text style={styles.subtitle}>Most popular movies this week</Text>
       </View>
 
-      {/* Filter Buttons */}
+      {/* Language Filter Dropdown */}
       <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            filter === "all" && styles.filterButtonActive,
-          ]}
-          onPress={() => setFilter("all")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              filter === "all" && styles.filterTextActive,
-            ]}
+        <Feather
+          name="globe"
+          size={18}
+          color="#666"
+          style={styles.filterIcon}
+        />
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={filter}
+            onValueChange={(itemValue) => setFilter(itemValue)}
+            style={styles.picker}
+            dropdownIconColor="#007AFF"
           >
-            All
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            filter === "movies" && styles.filterButtonActive,
-          ]}
-          onPress={() => setFilter("movies")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              filter === "movies" && styles.filterTextActive,
-            ]}
-          >
-            Movies
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            filter === "series" && styles.filterButtonActive,
-          ]}
-          onPress={() => setFilter("series")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              filter === "series" && styles.filterTextActive,
-            ]}
-          >
-            Series
-          </Text>
-        </TouchableOpacity>
+            <Picker.Item label="All Languages" value="all" />
+            <Picker.Item label="English" value="english" />
+            <Picker.Item label="Korean" value="korean" />
+            <Picker.Item label="Spanish" value="spanish" />
+            <Picker.Item label="German" value="german" />
+          </Picker>
+        </View>
       </View>
 
       {/* Movie Grid */}
@@ -239,28 +210,32 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: "row",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    marginBottom: 8,
-    gap: 8,
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+    minHeight: 50,
   },
-  filterButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#f5f5f5",
+  filterIcon: {
+    marginRight: 8,
   },
-  filterButtonActive: {
-    backgroundColor: "#007AFF",
+  pickerWrapper: {
+    flex: 1,
+    marginLeft: -8,
   },
-  filterText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#666",
-  },
-  filterTextActive: {
-    color: "#fff",
+  picker: {
+    height: 50,
+    color: "#000",
+    fontSize: 15,
   },
   gridContainer: {
     paddingHorizontal: 12,
