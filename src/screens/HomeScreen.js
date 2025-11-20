@@ -1,68 +1,174 @@
 import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import MovieCard from "../components/MovieCard";
-import SectionHeader from "../components/SectionHeader";
 
-// Dummy data for trending movies
-const TRENDING_MOVIES = [
+// Dummy TMDB-style movie data with different statuses
+const DUMMY_MOVIES_DATA = [
   {
     id: "1",
     title: "The Dark Knight",
-    poster: "https://via.placeholder.com/140x200/1a1a1a/ffffff?text=Movie+1",
+    poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    status: "Popular",
+    rating: 9.0,
   },
   {
     id: "2",
     title: "Inception",
-    poster: "https://via.placeholder.com/140x200/2a2a2a/ffffff?text=Movie+2",
+    poster: "https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
+    status: "Trending",
+    rating: 8.8,
   },
   {
     id: "3",
     title: "Interstellar",
-    poster: "https://via.placeholder.com/140x200/3a3a3a/ffffff?text=Movie+3",
+    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+    status: "Top Rated",
+    rating: 8.6,
   },
   {
     id: "4",
     title: "The Matrix",
-    poster: "https://via.placeholder.com/140x200/4a4a4a/ffffff?text=Movie+4",
+    poster: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+    status: "Popular",
+    rating: 8.7,
   },
   {
     id: "5",
     title: "Pulp Fiction",
-    poster: "https://via.placeholder.com/140x200/5a5a5a/ffffff?text=Movie+5",
+    poster: "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
+    status: "Top Rated",
+    rating: 8.9,
   },
   {
     id: "6",
     title: "Fight Club",
-    poster: "https://via.placeholder.com/140x200/6a6a6a/ffffff?text=Movie+6",
+    poster: "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+    status: "Trending",
+    rating: 8.8,
+  },
+  {
+    id: "7",
+    title: "Forrest Gump",
+    poster: "https://image.tmdb.org/t/p/w500/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
+    status: "Popular",
+    rating: 8.8,
+  },
+  {
+    id: "8",
+    title: "The Godfather",
+    poster: "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+    status: "Top Rated",
+    rating: 9.2,
+  },
+  {
+    id: "9",
+    title: "The Shawshank Redemption",
+    poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+    status: "Top Rated",
+    rating: 9.3,
+  },
+  {
+    id: "10",
+    title: "Parasite",
+    poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    status: "Trending",
+    rating: 8.5,
+  },
+  {
+    id: "11",
+    title: "Avengers: Endgame",
+    poster: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
+    status: "Popular",
+    rating: 8.4,
+  },
+  {
+    id: "12",
+    title: "Spider-Man: No Way Home",
+    poster: "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
+    status: "Upcoming",
+    rating: 8.2,
+  },
+  {
+    id: "13",
+    title: "Dune: Part Two",
+    poster: "https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg",
+    status: "Upcoming",
+    rating: 8.7,
+  },
+  {
+    id: "14",
+    title: "Oppenheimer",
+    poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+    status: "Trending",
+    rating: 8.6,
+  },
+  {
+    id: "15",
+    title: "Barbie",
+    poster: "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg",
+    status: "Popular",
+    rating: 7.2,
+  },
+  {
+    id: "16",
+    title: "The Batman",
+    poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+    status: "Upcoming",
+    rating: 7.8,
   },
 ];
 
+// Function to fetch movies (simulated API call)
+const fetchMovies = async () => {
+  // Simulate API delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(DUMMY_MOVIES_DATA);
+    }, 1000);
+  });
+};
+
 export default function HomeScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter trending movies based on search query
-  const filteredMovies = TRENDING_MOVIES.filter((movie) =>
+  // Fetch movies on component mount
+  useEffect(() => {
+    loadMovies();
+  }, []);
+
+  const loadMovies = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchMovies();
+      setMovies(data);
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter movies based on search query
+  const filteredMovies = movies.filter((movie) =>
     movie.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleMoviePress = (movie) => {
-    // Handle movie press - could navigate to detail screen
+    // Navigate to detail screen (will be implemented later)
     console.log("Movie pressed:", movie.title);
-  };
-
-  const handleFavouritesPress = () => {
-    navigation.navigate("Favourites");
+    // navigation.navigate('Details', { movie });
   };
 
   return (
@@ -74,57 +180,66 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.appName}>StreamBox</Text>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Feather
-            name="search"
-            size={20}
-            color="#666"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search movies…"
-            placeholderTextColor="#999"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Feather
+          name="search"
+          size={20}
+          color="#666"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search movies…"
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
 
-        {/* Trending Section */}
-        <View style={styles.section}>
-          <SectionHeader title="Trending" />
-          <FlatList
-            horizontal
-            data={filteredMovies}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <MovieCard movie={item} onPress={() => handleMoviePress(item)} />
-            )}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.trendingList}
-          />
-        </View>
+      {/* Section Heading */}
+      <View style={styles.sectionHeaderContainer}>
+        <Text style={styles.sectionTitle}>
+          {searchQuery ? "Search Results" : "All Movies"}
+        </Text>
+        <Text style={styles.sectionSubtitle}>
+          {filteredMovies.length}{" "}
+          {filteredMovies.length === 1 ? "movie" : "movies"}
+        </Text>
+      </View>
 
-        {/* My Library Section */}
-        <View style={styles.section}>
-          <SectionHeader title="My Library" />
-          <TouchableOpacity
-            style={styles.libraryCard}
-            onPress={handleFavouritesPress}
-          >
-            <Feather name="heart" size={32} color="#007AFF" />
-            <Text style={styles.libraryTitle}>Favourites</Text>
-            <Text style={styles.librarySubtitle}>
-              Your favourite movies & shows
-            </Text>
-          </TouchableOpacity>
+      {/* Movie List */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Loading movies...</Text>
         </View>
-      </ScrollView>
+      ) : (
+        <FlatList
+          data={filteredMovies}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <MovieCard movie={item} onPress={() => handleMoviePress(item)} />
+          )}
+          numColumns={2}
+          contentContainerStyle={styles.movieList}
+          columnWrapperStyle={styles.columnWrapper}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Feather name="film" size={64} color="#ccc" />
+              <Text style={styles.emptyText}>
+                {searchQuery ? "No movies found" : "No movies available"}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {searchQuery
+                  ? "Try a different search term"
+                  : "Check back later"}
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -132,7 +247,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F8F9FA",
   },
   topBar: {
     flexDirection: "row",
@@ -140,25 +255,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E5E5",
   },
   appName: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#000",
   },
-  scrollView: {
-    flex: 1,
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
-    marginHorizontal: 20,
+    marginHorizontal: 16,
     marginTop: 16,
-    marginBottom: 20,
+    marginBottom: 12,
     height: 48,
     paddingHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   searchIcon: {
     marginRight: 12,
@@ -168,33 +288,55 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
   },
-  section: {
-    marginBottom: 32,
-    paddingHorizontal: 20,
+  sectionHeaderContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  trendingList: {
-    paddingRight: 8,
-  },
-  libraryCard: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 16,
-    padding: 24,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  libraryTitle: {
-    fontSize: 20,
+  sectionTitle: {
+    fontSize: 22,
     fontWeight: "bold",
     color: "#000",
-    marginTop: 12,
+    marginBottom: 4,
   },
-  librarySubtitle: {
+  sectionSubtitle: {
     fontSize: 14,
     color: "#666",
-    marginTop: 4,
+  },
+  movieList: {
+    paddingHorizontal: 8,
+    paddingBottom: 20,
+  },
+  columnWrapper: {
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#666",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  emptySubtext: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#999",
   },
 });
