@@ -190,9 +190,8 @@ export default function HomeScreen({ navigation }) {
   });
 
   const handleMoviePress = (movie) => {
-    // Navigate to detail screen (will be implemented later)
-    console.log("Movie pressed:", movie.title);
-    // navigation.navigate('Details', { movie });
+    // Navigate to Details screen with movie data
+    navigation.navigate("Details", { movie });
   };
 
   return (

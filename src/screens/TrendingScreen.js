@@ -112,7 +112,7 @@ const TRENDING_DATA = [
   },
 ];
 
-export default function TrendingScreen() {
+export default function TrendingScreen({ navigation }) {
   const [filter, setFilter] = useState("all"); // all, english, korean, spanish
 
   // Filter data based on selected language
@@ -128,7 +128,7 @@ export default function TrendingScreen() {
   const filteredData = getFilteredData();
 
   const handleMoviePress = (movie) => {
-    console.log("Movie pressed:", movie.title);
+    navigation.navigate("Details", { movie });
   };
 
   const renderMovieItem = ({ item, index }) => {
