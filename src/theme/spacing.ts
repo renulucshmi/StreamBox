@@ -1,5 +1,5 @@
 /**
- * Spacing Constants
+ * Spacing Constants (TypeScript)
  * Centralized spacing values for consistent layout
  */
 
@@ -14,21 +14,21 @@ export const SPACING = {
   xxxl: 40,
   huge: 48,
   massive: 64,
-};
+} as const;
 
 // Common padding values
 export const PADDING = {
   screen: SPACING.base,
   card: SPACING.md,
   section: SPACING.lg,
-};
+} as const;
 
 // Common margin values
 export const MARGIN = {
   small: SPACING.sm,
   medium: SPACING.md,
   large: SPACING.lg,
-};
+} as const;
 
 // Border radius values
 export const BORDER_RADIUS = {
@@ -37,11 +37,11 @@ export const BORDER_RADIUS = {
   lg: 12,
   xl: 16,
   round: 9999,
-};
+} as const;
 
 // Border width values
 export const BORDER_WIDTH = {
   thin: 1,
   medium: 2,
   thick: 3,
-};
+} as const;

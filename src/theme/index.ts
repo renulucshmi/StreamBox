@@ -1,8 +1,9 @@
 /**
- * Theme Configuration
+ * Theme Configuration (TypeScript)
  * Exports complete theme objects and utility functions
  */
 
+import type { Theme, ThemeMode } from "../types/theme";
 import {
   COMMON_COLORS,
   DARK_COLORS,
@@ -24,7 +25,7 @@ import {
 } from "./typography";
 
 // Light theme object
-export const lightTheme = {
+export const lightTheme: Theme = {
   mode: "light",
   colors: LIGHT_COLORS,
   statusColors: STATUS_COLORS,
@@ -41,7 +42,7 @@ export const lightTheme = {
 };
 
 // Dark theme object
-export const darkTheme = {
+export const darkTheme: Theme = {
   mode: "dark",
   colors: DARK_COLORS,
   statusColors: STATUS_COLORS,
@@ -59,10 +60,8 @@ export const darkTheme = {
 
 /**
  * Get theme by mode
- * @param {string} mode - 'light' or 'dark'
- * @returns {Object} Theme object
  */
-export const getTheme = (mode) => {
+export const getTheme = (mode: ThemeMode): Theme => {
   return mode === "dark" ? darkTheme : lightTheme;
 };
 

@@ -1,5 +1,5 @@
 /**
- * Typography Constants
+ * Typography Constants (TypeScript)
  * Centralized font sizes, weights, and styles
  */
 
@@ -14,20 +14,20 @@ export const FONT_SIZES = {
   xxxl: 24,
   huge: 28,
   massive: 32,
-};
+} as const;
 
 export const FONT_WEIGHTS = {
   regular: "400",
   medium: "500",
   semibold: "600",
   bold: "700",
-};
+} as const;
 
 export const LINE_HEIGHTS = {
   tight: 1.2,
   normal: 1.5,
   relaxed: 1.75,
-};
+} as const;
 
 // Common text styles
 export const TEXT_STYLES = {
@@ -65,4 +65,4 @@ export const TEXT_STYLES = {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.semibold,
   },
-};
+} as const;

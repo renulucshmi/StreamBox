@@ -1,25 +1,30 @@
 /**
- * Authentication Context
+ * Authentication Context (TypeScript)
  * Refactored to use authService and storageService
  * Separation of concerns: UI state management separated from API calls
  */
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser } from "../services/authService";
 import { getUser, removeUser, saveUser } from "../services/storageService";
+import type { AuthContextType, User } from "../types";
 
-const AuthContext = createContext();
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Load user from storage on app start
   useEffect(() => {
     loadUserFromStorage();
   }, []);
 
-  const loadUserFromStorage = async () => {
+  const loadUserFromStorage = async (): Promise<void> => {
     try {
       const storedUser = await getUser();
       if (storedUser) {
@@ -32,9 +37,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async ({ email, password }) => {
+  const login = async (credentials: {
+    email: string;
+    password: string;
+  }): Promise<User> => {
     try {
-      const userData = await loginUser({ email, password });
+      const userData = await loginUser(credentials);
       setUser(userData);
       await saveUser(userData);
       return userData;
@@ -43,9 +51,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async ({ username, email, password }) => {
+  const register = async (data: {
+    username: string;
+    email: string;
+    password: string;
+  }): Promise<User> => {
     try {
-      const userData = await registerUser({ username, email, password });
+      const userData = await registerUser(data);
       setUser(userData);
       await saveUser(userData);
       return userData;
@@ -54,7 +66,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await removeUser();
       setUser(null);
@@ -63,22 +75,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const value: AuthContextType = {
+    user,
+    loading,
+    login,
+    register,
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");

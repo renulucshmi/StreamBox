@@ -1,25 +1,30 @@
 /**
- * Theme Context
+ * Theme Context (TypeScript)
  * Refactored to use storageService and theme constants
  * Separation of concerns: theme state management separated from storage
  */
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { getTheme, saveTheme } from "../services/storageService";
 import { darkTheme, lightTheme } from "../theme";
+import type { Theme, ThemeContextType, ThemeMode } from "../types";
 
-const ThemeContext = createContext();
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState("light");
-  const [loading, setLoading] = useState(true);
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const [theme, setTheme] = useState<ThemeMode>("light");
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Load theme from storage on app start
   useEffect(() => {
     loadThemeFromStorage();
   }, []);
 
-  const loadThemeFromStorage = async () => {
+  const loadThemeFromStorage = async (): Promise<void> => {
     try {
       const storedTheme = await getTheme();
       if (storedTheme && (storedTheme === "light" || storedTheme === "dark")) {
@@ -41,9 +46,9 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
-  const toggleTheme = async () => {
+  const toggleTheme = async (): Promise<void> => {
     try {
-      const newTheme = theme === "light" ? "dark" : "light";
+      const newTheme: ThemeMode = theme === "light" ? "dark" : "light";
       setTheme(newTheme);
       await saveTheme(newTheme);
     } catch (error) {
@@ -51,23 +56,21 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
-  const currentTheme = theme === "light" ? lightTheme : darkTheme;
+  const currentTheme = (theme === "light" ? lightTheme : darkTheme) as Theme;
+
+  const value: ThemeContextType = {
+    theme: currentTheme,
+    themeMode: theme,
+    toggleTheme,
+    loading,
+  };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme: currentTheme,
-        themeMode: theme,
-        toggleTheme,
-        loading,
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => {
+export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {
     throw new Error("useTheme must be used within a ThemeProvider");

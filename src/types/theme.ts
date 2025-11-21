@@ -45,57 +45,18 @@ export type CommonColors = {
   favourite: string;
 };
 
-export type Spacing = {
-  xs: number;
-  sm: number;
-  md: number;
-  lg: number;
-  xl: number;
-  xxl: number;
-};
-
 export type Theme = {
   mode: ThemeMode;
   colors: ThemeColors;
   statusColors: StatusColors;
   commonColors: CommonColors;
-  spacing: Spacing;
-  padding: Spacing;
-  margin: Spacing;
-  borderRadius: {
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-    full: number;
-  };
-  borderWidth: {
-    thin: number;
-    medium: number;
-    thick: number;
-  };
-  fontSize: {
-    xs: number;
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-    xxl: number;
-    xxxl: number;
-  };
-  fontWeight: {
-    light: "300";
-    regular: "400";
-    medium: "500";
-    semibold: "600";
-    bold: "700";
-    extrabold: "800";
-  };
-  lineHeight: {
-    tight: number;
-    normal: number;
-    relaxed: number;
-    loose: number;
-  };
-  textStyles: Record<string, unknown>;
+  spacing: Record<string, number>;
+  padding: Record<string, number>;
+  margin: Record<string, number>;
+  borderRadius: Record<string, number>;
+  borderWidth: Record<string, number>;
+  fontSize: Record<string, number>;
+  fontWeight: Record<string, string>;
+  lineHeight: Record<string, number>;
+  textStyles: Record<string, any>;
 };
