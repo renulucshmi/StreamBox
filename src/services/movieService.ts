@@ -4,8 +4,17 @@
  * Keeps business logic separate from UI components
  */
 
+interface DummyMovie {
+  id: string;
+  title: string;
+  poster: string;
+  status: "Popular" | "Trending" | "Top Rated";
+  rating: number;
+  language: string;
+}
+
 // Dummy TMDB-style movie data
-const DUMMY_MOVIES_DATA = [
+const DUMMY_MOVIES_DATA: DummyMovie[] = [
   {
     id: "1",
     title: "The Dark Knight",
@@ -138,9 +147,8 @@ const DUMMY_MOVIES_DATA = [
 
 /**
  * Fetch all movies (simulated API call)
- * @returns {Promise<Array>} Array of movie objects
  */
-export const fetchMovies = async () => {
+export const fetchMovies = async (): Promise<DummyMovie[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(DUMMY_MOVIES_DATA);
@@ -150,10 +158,10 @@ export const fetchMovies = async () => {
 
 /**
  * Fetch a single movie by ID
- * @param {string} movieId - The movie ID
- * @returns {Promise<Object|null>} Movie object or null
  */
-export const fetchMovieById = async (movieId) => {
+export const fetchMovieById = async (
+  movieId: string
+): Promise<DummyMovie | null> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const movie = DUMMY_MOVIES_DATA.find((m) => m.id === movieId);
@@ -164,9 +172,8 @@ export const fetchMovieById = async (movieId) => {
 
 /**
  * Fetch trending movies
- * @returns {Promise<Array>} Array of trending movies
  */
-export const fetchTrendingMovies = async () => {
+export const fetchTrendingMovies = async (): Promise<DummyMovie[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const trending = DUMMY_MOVIES_DATA.filter(
@@ -179,9 +186,8 @@ export const fetchTrendingMovies = async () => {
 
 /**
  * Fetch popular movies
- * @returns {Promise<Array>} Array of popular movies
  */
-export const fetchPopularMovies = async () => {
+export const fetchPopularMovies = async (): Promise<DummyMovie[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const popular = DUMMY_MOVIES_DATA.filter(
@@ -194,9 +200,8 @@ export const fetchPopularMovies = async () => {
 
 /**
  * Fetch top rated movies
- * @returns {Promise<Array>} Array of top rated movies
  */
-export const fetchTopRatedMovies = async () => {
+export const fetchTopRatedMovies = async (): Promise<DummyMovie[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const topRated = DUMMY_MOVIES_DATA.filter(
@@ -209,10 +214,8 @@ export const fetchTopRatedMovies = async () => {
 
 /**
  * Search movies by query
- * @param {string} query - Search query
- * @returns {Promise<Array>} Array of matching movies
  */
-export const searchMovies = async (query) => {
+export const searchMovies = async (query: string): Promise<DummyMovie[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const results = DUMMY_MOVIES_DATA.filter((movie) =>
@@ -225,10 +228,10 @@ export const searchMovies = async (query) => {
 
 /**
  * Filter movies by language
- * @param {string} language - Language to filter by
- * @returns {Promise<Array>} Array of movies in specified language
  */
-export const fetchMoviesByLanguage = async (language) => {
+export const fetchMoviesByLanguage = async (
+  language: string
+): Promise<DummyMovie[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const results = DUMMY_MOVIES_DATA.filter(

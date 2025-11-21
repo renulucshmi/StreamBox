@@ -4,12 +4,29 @@
  * Easily testable and reusable across the app
  */
 
+interface ValidationResult {
+  isValid: boolean;
+  error: string | null;
+}
+
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+interface RegistrationFormData {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+type ValidationErrors = Record<string, string>;
+
 /**
  * Validate email address
- * @param {string} email - Email to validate
- * @returns {Object} Validation result with isValid and error message
  */
-export const validateEmail = (email) => {
+export const validateEmail = (email: string): ValidationResult => {
   if (!email || !email.trim()) {
     return { isValid: false, error: "Email is required" };
   }
@@ -24,11 +41,11 @@ export const validateEmail = (email) => {
 
 /**
  * Validate password
- * @param {string} password - Password to validate
- * @param {number} minLength - Minimum password length (default: 8)
- * @returns {Object} Validation result with isValid and error message
  */
-export const validatePassword = (password, minLength = 8) => {
+export const validatePassword = (
+  password: string,
+  minLength: number = 8
+): ValidationResult => {
   if (!password) {
     return { isValid: false, error: "Password is required" };
   }
@@ -45,11 +62,11 @@ export const validatePassword = (password, minLength = 8) => {
 
 /**
  * Validate username
- * @param {string} username - Username to validate
- * @param {number} minLength - Minimum username length (default: 3)
- * @returns {Object} Validation result with isValid and error message
  */
-export const validateUsername = (username, minLength = 3) => {
+export const validateUsername = (
+  username: string,
+  minLength: number = 3
+): ValidationResult => {
   if (!username || !username.trim()) {
     return { isValid: false, error: "Username is required" };
   }
@@ -75,11 +92,11 @@ export const validateUsername = (username, minLength = 3) => {
 
 /**
  * Validate passwords match
- * @param {string} password - Original password
- * @param {string} confirmPassword - Confirmation password
- * @returns {Object} Validation result with isValid and error message
  */
-export const validatePasswordsMatch = (password, confirmPassword) => {
+export const validatePasswordsMatch = (
+  password: string,
+  confirmPassword: string
+): ValidationResult => {
   if (password !== confirmPassword) {
     return { isValid: false, error: "Passwords do not match" };
   }
@@ -89,22 +106,21 @@ export const validatePasswordsMatch = (password, confirmPassword) => {
 
 /**
  * Validate login form
- * @param {Object} formData - Form data to validate
- * @param {string} formData.email - Email field
- * @param {string} formData.password - Password field
- * @returns {Object} Validation errors object
  */
-export const validateLoginForm = ({ email, password }) => {
-  const errors = {};
+export const validateLoginForm = ({
+  email,
+  password,
+}: LoginFormData): ValidationErrors => {
+  const errors: ValidationErrors = {};
 
   const emailValidation = validateEmail(email);
   if (!emailValidation.isValid) {
-    errors.email = emailValidation.error;
+    errors.email = emailValidation.error!;
   }
 
   const passwordValidation = validatePassword(password);
   if (!passwordValidation.isValid) {
-    errors.password = passwordValidation.error;
+    errors.password = passwordValidation.error!;
   }
 
   return errors;
@@ -112,40 +128,34 @@ export const validateLoginForm = ({ email, password }) => {
 
 /**
  * Validate registration form
- * @param {Object} formData - Form data to validate
- * @param {string} formData.username - Username field
- * @param {string} formData.email - Email field
- * @param {string} formData.password - Password field
- * @param {string} formData.confirmPassword - Confirm password field
- * @returns {Object} Validation errors object
  */
 export const validateRegistrationForm = ({
   username,
   email,
   password,
   confirmPassword,
-}) => {
-  const errors = {};
+}: RegistrationFormData): ValidationErrors => {
+  const errors: ValidationErrors = {};
 
   const usernameValidation = validateUsername(username);
   if (!usernameValidation.isValid) {
-    errors.username = usernameValidation.error;
+    errors.username = usernameValidation.error!;
   }
 
   const emailValidation = validateEmail(email);
   if (!emailValidation.isValid) {
-    errors.email = emailValidation.error;
+    errors.email = emailValidation.error!;
   }
 
   const passwordValidation = validatePassword(password);
   if (!passwordValidation.isValid) {
-    errors.password = passwordValidation.error;
+    errors.password = passwordValidation.error!;
   }
 
   if (password && confirmPassword) {
     const matchValidation = validatePasswordsMatch(password, confirmPassword);
     if (!matchValidation.isValid) {
-      errors.confirmPassword = matchValidation.error;
+      errors.confirmPassword = matchValidation.error!;
     }
   }
 
@@ -154,9 +164,7 @@ export const validateRegistrationForm = ({
 
 /**
  * Check if validation errors object is empty
- * @param {Object} errors - Errors object
- * @returns {boolean} True if no errors
  */
-export const isValidForm = (errors) => {
+export const isValidForm = (errors: ValidationErrors): boolean => {
   return Object.keys(errors).length === 0;
 };

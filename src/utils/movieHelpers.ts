@@ -3,13 +3,31 @@
  * Specific utilities for movie-related operations
  */
 
+interface Movie {
+  title: string;
+  status: string;
+  rating?: number;
+  language?: string;
+  overview?: string;
+  [key: string]: any;
+}
+
+interface LanguageOption {
+  label: string;
+  value: string;
+}
+
+interface CardDimensions {
+  width: number;
+  height: number;
+  aspectRatio: number;
+}
+
 /**
  * Get status color for a movie status
- * @param {string} status - Movie status
- * @returns {string} Color hex code
  */
-export const getStatusColor = (status) => {
-  const statusColors = {
+export const getStatusColor = (status: string): string => {
+  const statusColors: Record<string, string> = {
     Popular: "#FF6B6B",
     Trending: "#4ECDC4",
     Upcoming: "#FFD93D",
@@ -21,10 +39,8 @@ export const getStatusColor = (status) => {
 
 /**
  * Generate default overview text for a movie
- * @param {Object} movie - Movie object
- * @returns {string} Default overview text
  */
-export const getDefaultOverview = (movie) => {
+export const getDefaultOverview = (movie: Movie): string => {
   return `${
     movie.title
   } is a ${movie.status.toLowerCase()} movie that has captivated audiences worldwide. With stunning visuals and compelling storytelling, this film delivers an unforgettable cinematic experience. The talented cast brings the characters to life in ways that will keep you engaged from start to finish.`;
@@ -32,10 +48,8 @@ export const getDefaultOverview = (movie) => {
 
 /**
  * Format movie details for display
- * @param {Object} movie - Movie object
- * @returns {Object} Formatted details
  */
-export const formatMovieDetails = (movie) => {
+export const formatMovieDetails = (movie: Movie) => {
   return {
     language: movie.language || "N/A",
     status: movie.status || "Unknown",
@@ -46,11 +60,11 @@ export const formatMovieDetails = (movie) => {
 
 /**
  * Get section title based on filters
- * @param {string} searchQuery - Current search query
- * @param {string} languageFilter - Current language filter
- * @returns {string} Section title
  */
-export const getSectionTitle = (searchQuery, languageFilter) => {
+export const getSectionTitle = (
+  searchQuery: string,
+  languageFilter: string
+): string => {
   if (searchQuery) {
     return "Search Results";
   }
@@ -66,9 +80,8 @@ export const getSectionTitle = (searchQuery, languageFilter) => {
 
 /**
  * Get available languages for filter dropdown
- * @returns {Array} Array of language options
  */
-export const getLanguageOptions = () => {
+export const getLanguageOptions = (): LanguageOption[] => {
   return [
     { label: "All Languages", value: "all" },
     { label: "English", value: "english" },
@@ -81,16 +94,12 @@ export const getLanguageOptions = () => {
 
 /**
  * Calculate movie grid layout
- * @param {number} screenWidth - Screen width
- * @param {number} columns - Number of columns (default: 2)
- * @param {number} padding - Total horizontal padding (default: 48)
- * @returns {Object} Layout dimensions
  */
 export const getMovieCardDimensions = (
-  screenWidth,
-  columns = 2,
-  padding = 48
-) => {
+  screenWidth: number,
+  columns: number = 2,
+  padding: number = 48
+): CardDimensions => {
   const cardWidth = (screenWidth - padding) / columns;
   const cardHeight = cardWidth * 1.5; // 3:2 aspect ratio
 
