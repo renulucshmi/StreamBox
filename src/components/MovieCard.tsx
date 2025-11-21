@@ -13,20 +13,11 @@ import { useTheme } from "../context/ThemeContext";
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2; // 2 columns with padding
 
-interface Movie {
-  id: string;
-  title: string;
-  poster: string;
-  status: string;
-  rating?: number;
-  language?: string;
-}
-
 interface MovieCardProps {
-  movie: Movie;
+  movie: any;
   onPress: () => void;
   isFavourite?: boolean;
-  onFavouritePress?: (movie: Movie) => void;
+  onFavouritePress?: (movie: any) => void;
 }
 
 const MovieCard: React.FC<MovieCardProps> = ({

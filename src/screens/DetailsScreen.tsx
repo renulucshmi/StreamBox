@@ -31,32 +31,34 @@ import {
   removeFromWatchLater,
   selectWatchLater,
 } from "../store/slices/watchLaterSlice";
-import { isMovieInList } from "../utils/helpers";
+import { AppDispatch } from "../store/store";
 import { getStatusColor } from "../utils/movieHelpers";
 
-export default function DetailsScreen({ route, navigation }) {
+export default function DetailsScreen({ route, navigation }: any) {
   const { movie } = route.params;
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { theme, themeMode, toggleTheme } = useTheme();
 
   // Local state for success messages
-  const [showFavouriteSuccess, setShowFavouriteSuccess] = useState(false);
-  const [showWatchLaterSuccess, setShowWatchLaterSuccess] = useState(false);
+  const [showFavouriteSuccess, setShowFavouriteSuccess] =
+    useState<boolean>(false);
+  const [showWatchLaterSuccess, setShowWatchLaterSuccess] =
+    useState<boolean>(false);
 
   // Get data from Redux using selectors
   const favourites = useSelector(selectFavourites);
   const watchLater = useSelector(selectWatchLater);
 
-  // Check if movie is in lists using helper function
-  const isFavourite = isMovieInList(favourites, movie.id);
-  const isInWatchLater = isMovieInList(watchLater, movie.id);
+  // Check if movie is in lists
+  const isFavourite = favourites.some((item) => item.id === movie.id);
+  const isInWatchLater = watchLater.some((item) => item.id === movie.id);
 
   // Handler functions
   const handleAddToFavourites = () => {
     if (isFavourite) {
       dispatch(removeFromFavourites(movie.id));
     } else {
-      dispatch(addToFavourites(movie));
+      dispatch(addToFavourites(movie as any));
       setShowFavouriteSuccess(true);
       setTimeout(() => setShowFavouriteSuccess(false), 2000);
     }
@@ -66,7 +68,7 @@ export default function DetailsScreen({ route, navigation }) {
     if (isInWatchLater) {
       dispatch(removeFromWatchLater(movie.id));
     } else {
-      dispatch(addToWatchLater(movie));
+      dispatch(addToWatchLater(movie as any));
       setShowWatchLaterSuccess(true);
       setTimeout(() => setShowWatchLaterSuccess(false), 2000);
     }

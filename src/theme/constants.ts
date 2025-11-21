@@ -9,21 +9,21 @@ export const STORAGE_KEYS = {
   THEME: "streambox_theme",
   FAVOURITES: "streambox_favourites",
   WATCH_LATER: "streambox_watch_later",
-};
+} as const;
 
 // API configuration (for future real API integration)
 export const API_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3",
   IMAGE_BASE_URL: "https://image.tmdb.org/t/p",
   TIMEOUT: 10000,
-};
+} as const;
 
 // Movie grid configuration
 export const MOVIE_GRID = {
   COLUMNS: 2,
   ASPECT_RATIO: 1.5,
   SPACING: 16,
-};
+} as const;
 
 // Language options
 export const LANGUAGE_OPTIONS = [
@@ -33,7 +33,7 @@ export const LANGUAGE_OPTIONS = [
   { label: "Spanish", value: "spanish" },
   { label: "French", value: "french" },
   { label: "German", value: "german" },
-];
+] as const;
 
 // Movie status types
 export const MOVIE_STATUS = {
@@ -41,7 +41,7 @@ export const MOVIE_STATUS = {
   TRENDING: "Trending",
   UPCOMING: "Upcoming",
   TOP_RATED: "Top Rated",
-};
+} as const;
 
 // Validation rules
 export const VALIDATION_RULES = {
@@ -49,7 +49,7 @@ export const VALIDATION_RULES = {
   MIN_USERNAME_LENGTH: 3,
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   USERNAME_REGEX: /^[a-zA-Z0-9_]+$/,
-};
+} as const;
 
 // Error messages
 export const ERROR_MESSAGES = {
@@ -57,7 +57,7 @@ export const ERROR_MESSAGES = {
   NETWORK: "Network error. Please check your connection.",
   AUTH_FAILED: "Authentication failed. Please try again.",
   INVALID_CREDENTIALS: "Invalid email or password.",
-};
+} as const;
 
 // Success messages
 export const SUCCESS_MESSAGES = {
@@ -67,7 +67,7 @@ export const SUCCESS_MESSAGES = {
   REMOVED_FROM_FAVOURITES: "Removed from Favourites!",
   ADDED_TO_WATCH_LATER: "Added to Watch Later!",
   REMOVED_FROM_WATCH_LATER: "Removed from Watch Later!",
-};
+} as const;
 
 // Screen names (for navigation)
 export const SCREENS = {
@@ -79,11 +79,11 @@ export const SCREENS = {
   PROFILE: "Profile",
   LOGIN: "Login",
   REGISTER: "Register",
-};
+} as const;
 
 // Animation durations (in milliseconds)
 export const ANIMATION = {
   FAST: 200,
   NORMAL: 300,
   SLOW: 500,
-};
+} as const;

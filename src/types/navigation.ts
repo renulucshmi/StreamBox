@@ -10,7 +10,7 @@ export type RootStackParamList = {
   Trending: undefined;
   Favourites: undefined;
   Profile: undefined;
-  Details: { movieId: number };
+  Details: { movie: any };
   HomeMain: undefined;
   TrendingMain: undefined;
   FavouritesMain: undefined;

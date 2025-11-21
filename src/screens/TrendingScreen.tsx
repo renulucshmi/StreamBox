@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,9 +13,24 @@ import {
   removeFromFavourites,
   selectFavourites,
 } from "../store/slices/favouritesSlice";
+import { AppDispatch } from "../store/store";
+import { RootStackParamList } from "../types/navigation";
+
+interface TrendingMovie {
+  id: string;
+  title: string;
+  poster: string;
+  rating: number;
+  status: string;
+  language: string;
+}
+
+interface TrendingScreenProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Trending">;
+}
 
 // Extended dummy data for trending movies and series with language filters
-const TRENDING_DATA = [
+const TRENDING_DATA: TrendingMovie[] = [
   {
     id: "1",
     title: "The Dark Knight",
@@ -113,14 +129,14 @@ const TRENDING_DATA = [
   },
 ];
 
-export default function TrendingScreen({ navigation }) {
-  const dispatch = useDispatch();
+export default function TrendingScreen({ navigation }: TrendingScreenProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const favourites = useSelector(selectFavourites);
-  const { theme, themeMode, toggleTheme } = useTheme();
-  const [filter, setFilter] = useState("all"); // all, english, korean, spanish
+  const { theme } = useTheme();
+  const [filter, setFilter] = useState<string>("all"); // all, english, korean, spanish
 
   // Filter data based on selected language
-  const getFilteredData = () => {
+  const getFilteredData = (): TrendingMovie[] => {
     if (filter === "all") {
       return TRENDING_DATA;
     }
@@ -131,24 +147,26 @@ export default function TrendingScreen({ navigation }) {
 
   const filteredData = getFilteredData();
 
-  const handleMoviePress = (movie) => {
+  const handleMoviePress = (movie: any) => {
     navigation.navigate("Details", { movie });
   };
 
-  const handleFavouritePress = (movie) => {
-    const isFavourite = favourites.some((item) => item.id === movie.id);
+  const handleFavouritePress = (movie: any) => {
+    const isFavourite = favourites.some(
+      (item) => String(item.id) === String(movie.id)
+    );
     if (isFavourite) {
       dispatch(removeFromFavourites(movie.id));
     } else {
-      dispatch(addToFavourites(movie));
+      dispatch(addToFavourites(movie as any));
     }
   };
 
-  const isFavourite = (movieId) => {
-    return favourites.some((item) => item.id === movieId);
+  const isFavourite = (movieId: any): boolean => {
+    return favourites.some((item) => String(item.id) === String(movieId));
   };
 
-  const renderMovieItem = ({ item, index }) => {
+  const renderMovieItem = ({ item }: { item: TrendingMovie }) => {
     return (
       <View style={styles.gridItem}>
         <MovieCard

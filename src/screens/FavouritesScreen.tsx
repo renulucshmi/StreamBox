@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   Dimensions,
   FlatList,
@@ -16,25 +17,42 @@ import {
   removeFromFavourites,
   selectFavourites,
 } from "../store/slices/favouritesSlice";
+import { AppDispatch } from "../store/store";
+import { RootStackParamList } from "../types/navigation";
 
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2; // 2 columns with padding
 
-export default function FavouritesScreen({ navigation }) {
-  const dispatch = useDispatch();
+interface FavouriteMovie {
+  id: any;
+  title: string;
+  poster: string;
+  rating?: number;
+  status: string;
+  language?: string;
+}
+
+interface FavouritesScreenProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Favourites">;
+}
+
+export default function FavouritesScreen({
+  navigation,
+}: FavouritesScreenProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const favourites = useSelector(selectFavourites);
   const { theme, themeMode, toggleTheme } = useTheme();
 
-  const handleRemoveFromFavourites = (movieId) => {
+  const handleRemoveFromFavourites = (movieId: any) => {
     dispatch(removeFromFavourites(movieId));
   };
 
-  const handleMoviePress = (movie) => {
+  const handleMoviePress = (movie: any) => {
     navigation.navigate("Details", { movie });
   };
 
   // Get status color based on status type
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case "Popular":
         return "#FF6B6B";
@@ -49,7 +67,7 @@ export default function FavouritesScreen({ navigation }) {
     }
   };
 
-  const renderMovieCard = ({ item: movie }) => (
+  const renderMovieCard = ({ item: movie }: { item: any }) => (
     <View style={styles.cardWrapper}>
       <TouchableOpacity
         style={[

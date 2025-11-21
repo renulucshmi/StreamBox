@@ -7,6 +7,7 @@
  * - No business logic in JSX
  */
 
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,19 +25,25 @@ import {
   removeFromFavourites,
   selectFavourites,
 } from "../store/slices/favouritesSlice";
-import { filterMovies, isMovieInList } from "../utils/helpers";
+import { AppDispatch } from "../store/store";
+import { RootStackParamList } from "../types/navigation";
+import { filterMovies } from "../utils/helpers";
 import { getSectionTitle } from "../utils/movieHelpers";
 
-export default function HomeScreen({ navigation }) {
-  const dispatch = useDispatch();
+interface HomeScreenProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
+}
+
+export default function HomeScreen({ navigation }: HomeScreenProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const favourites = useSelector(selectFavourites);
   const { theme, themeMode, toggleTheme } = useTheme();
 
   // Local state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [languageFilter, setLanguageFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [movies, setMovies] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [languageFilter, setLanguageFilter] = useState<string>("all");
 
   // Fetch movies on component mount
   useEffect(() => {
@@ -60,13 +67,13 @@ export default function HomeScreen({ navigation }) {
   const filteredMovies = filterMovies(movies, searchQuery, languageFilter);
 
   // Navigation handler
-  const handleMoviePress = (movie) => {
+  const handleMoviePress = (movie: any) => {
     navigation.navigate("Details", { movie });
   };
 
   // Favourite toggle handler
-  const handleFavouritePress = (movie) => {
-    const isFav = isMovieInList(favourites, movie.id);
+  const handleFavouritePress = (movie: any) => {
+    const isFav = favourites.some((item) => item.id === movie.id);
     if (isFav) {
       dispatch(removeFromFavourites(movie.id));
     } else {
@@ -75,7 +82,8 @@ export default function HomeScreen({ navigation }) {
   };
 
   // Check if movie is favourite
-  const isFavourite = (movieId) => isMovieInList(favourites, movieId);
+  const isFavourite = (movieId: any): boolean =>
+    favourites.some((item) => item.id === movieId);
 
   // Get section title using helper
   const sectionTitle = getSectionTitle(searchQuery, languageFilter);
