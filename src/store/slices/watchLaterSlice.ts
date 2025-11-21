@@ -4,9 +4,14 @@
  * Pure reducer functions with no side effects
  */
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Movie } from "../../types/movie";
 
-const initialState = {
+interface WatchLaterState {
+  watchLater: Movie[];
+}
+
+const initialState: WatchLaterState = {
   watchLater: [],
 };
 
@@ -16,10 +21,8 @@ const watchLaterSlice = createSlice({
   reducers: {
     /**
      * Add a movie to watch later
-     * @param {Object} state - Current state
-     * @param {Object} action - Action with movie payload
      */
-    addToWatchLater: (state, action) => {
+    addToWatchLater: (state, action: PayloadAction<Movie>) => {
       const movie = action.payload;
       const exists = state.watchLater.find((item) => item.id === movie.id);
 
@@ -30,26 +33,21 @@ const watchLaterSlice = createSlice({
 
     /**
      * Remove a movie from watch later
-     * @param {Object} state - Current state
-     * @param {Object} action - Action with movie ID payload
      */
-    removeFromWatchLater: (state, action) => {
+    removeFromWatchLater: (state, action: PayloadAction<number>) => {
       const movieId = action.payload;
       state.watchLater = state.watchLater.filter((item) => item.id !== movieId);
     },
 
     /**
      * Load watch later from storage (used during app initialization)
-     * @param {Object} state - Current state
-     * @param {Object} action - Action with watch later array payload
      */
-    loadWatchLater: (state, action) => {
+    loadWatchLater: (state, action: PayloadAction<Movie[]>) => {
       state.watchLater = action.payload;
     },
 
     /**
      * Clear all watch later movies
-     * @param {Object} state - Current state
      */
     clearWatchLater: (state) => {
       state.watchLater = [];
@@ -66,11 +64,18 @@ export const {
 } = watchLaterSlice.actions;
 
 // Selectors
-export const selectWatchLater = (state) => state.watchLater.watchLater;
-export const selectWatchLaterCount = (state) =>
-  state.watchLater.watchLater.length;
-export const selectIsInWatchLater = (movieId) => (state) =>
-  state.watchLater.watchLater.some((item) => item.id === movieId);
+export const selectWatchLater = (state: {
+  watchLater: WatchLaterState;
+}): Movie[] => state.watchLater.watchLater;
+
+export const selectWatchLaterCount = (state: {
+  watchLater: WatchLaterState;
+}): number => state.watchLater.watchLater.length;
+
+export const selectIsInWatchLater =
+  (movieId: number) =>
+  (state: { watchLater: WatchLaterState }): boolean =>
+    state.watchLater.watchLater.some((item: Movie) => item.id === movieId);
 
 // Export reducer
 export default watchLaterSlice.reducer;

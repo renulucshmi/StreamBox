@@ -11,7 +11,7 @@ import {
   addToFavourites,
   removeFromFavourites,
   selectFavourites,
-} from "../store/favouritesSlice";
+} from "../store/slices/favouritesSlice";
 
 // Extended dummy data for trending movies and series with language filters
 const TRENDING_DATA = [

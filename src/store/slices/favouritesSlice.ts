@@ -4,9 +4,14 @@
  * Pure reducer functions with no side effects
  */
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Movie } from "../../types/movie";
 
-const initialState = {
+interface FavouritesState {
+  favourites: Movie[];
+}
+
+const initialState: FavouritesState = {
   favourites: [],
 };
 
@@ -16,10 +21,8 @@ const favouritesSlice = createSlice({
   reducers: {
     /**
      * Add a movie to favourites
-     * @param {Object} state - Current state
-     * @param {Object} action - Action with movie payload
      */
-    addToFavourites: (state, action) => {
+    addToFavourites: (state, action: PayloadAction<Movie>) => {
       const movie = action.payload;
       const exists = state.favourites.find((item) => item.id === movie.id);
 
@@ -30,26 +33,21 @@ const favouritesSlice = createSlice({
 
     /**
      * Remove a movie from favourites
-     * @param {Object} state - Current state
-     * @param {Object} action - Action with movie ID payload
      */
-    removeFromFavourites: (state, action) => {
+    removeFromFavourites: (state, action: PayloadAction<number>) => {
       const movieId = action.payload;
       state.favourites = state.favourites.filter((item) => item.id !== movieId);
     },
 
     /**
      * Load favourites from storage (used during app initialization)
-     * @param {Object} state - Current state
-     * @param {Object} action - Action with favourites array payload
      */
-    loadFavourites: (state, action) => {
+    loadFavourites: (state, action: PayloadAction<Movie[]>) => {
       state.favourites = action.payload;
     },
 
     /**
      * Clear all favourites
-     * @param {Object} state - Current state
      */
     clearFavourites: (state) => {
       state.favourites = [];
@@ -66,11 +64,18 @@ export const {
 } = favouritesSlice.actions;
 
 // Selectors
-export const selectFavourites = (state) => state.favourites.favourites;
-export const selectFavouritesCount = (state) =>
-  state.favourites.favourites.length;
-export const selectIsFavourite = (movieId) => (state) =>
-  state.favourites.favourites.some((item) => item.id === movieId);
+export const selectFavourites = (state: {
+  favourites: FavouritesState;
+}): Movie[] => state.favourites.favourites;
+
+export const selectFavouritesCount = (state: {
+  favourites: FavouritesState;
+}): number => state.favourites.favourites.length;
+
+export const selectIsFavourite =
+  (movieId: number) =>
+  (state: { favourites: FavouritesState }): boolean =>
+    state.favourites.favourites.some((item: Movie) => item.id === movieId);
 
 // Export reducer
 export default favouritesSlice.reducer;

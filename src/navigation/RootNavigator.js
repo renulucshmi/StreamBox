@@ -9,7 +9,7 @@ import DetailsScreen from "../screens/DetailsScreen";
 import FavouritesScreen from "../screens/FavouritesScreen";
 import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
-import ProfileScreen from "../screens/ProfileScreen.tsx";
+import ProfileScreen from "../screens/ProfileScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import TrendingScreen from "../screens/TrendingScreen";
 

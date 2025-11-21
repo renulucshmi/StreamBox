@@ -15,7 +15,7 @@ import { useTheme } from "../context/ThemeContext";
 import {
   removeFromFavourites,
   selectFavourites,
-} from "../store/favouritesSlice";
+} from "../store/slices/favouritesSlice";
 
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2; // 2 columns with padding
