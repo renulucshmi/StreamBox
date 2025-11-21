@@ -1,6 +1,5 @@
 import { Feather } from "@expo/vector-icons";
 import {
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Switch,
@@ -8,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 

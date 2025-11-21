@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function WatchLaterScreen() {
   return (

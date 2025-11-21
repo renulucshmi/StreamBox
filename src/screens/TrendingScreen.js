@@ -1,14 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useState } from "react";
-import {
-  FlatList,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import MovieCard from "../components/MovieCard";
 import SectionHeader from "../components/SectionHeader";
