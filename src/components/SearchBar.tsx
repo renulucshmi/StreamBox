@@ -5,10 +5,23 @@
  */
 
 import { Feather } from "@expo/vector-icons";
-import { StyleSheet, TextInput, View } from "react-native";
+import React from "react";
+import { StyleSheet, TextInput, View, ViewStyle, TextStyle } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
-const SearchBar = ({
+interface SearchBarProps {
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  iconName?: keyof typeof Feather.glyphMap;
+  iconSize?: number;
+  style?: ViewStyle;
+  inputStyle?: TextStyle;
+  autoFocus?: boolean;
+  onSubmitEditing?: () => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
   placeholder = "Search...",

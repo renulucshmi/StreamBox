@@ -4,5 +4,5 @@
  */
 
 export * from "./helpers";
-export * from "./validation";
 export * from "./movieHelpers";
+export * from "./validation";

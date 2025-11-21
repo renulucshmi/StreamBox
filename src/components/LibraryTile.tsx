@@ -1,7 +1,14 @@
 import { Feather } from "@expo/vector-icons";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-const LibraryTile = ({ icon, label, onPress }) => {
+interface LibraryTileProps {
+  icon: keyof typeof Feather.glyphMap;
+  label: string;
+  onPress: () => void;
+}
+
+const LibraryTile: React.FC<LibraryTileProps> = ({ icon, label, onPress }) => {
   return (
     <TouchableOpacity style={styles.tile} onPress={onPress}>
       <Feather name={icon} size={32} color="#000" />

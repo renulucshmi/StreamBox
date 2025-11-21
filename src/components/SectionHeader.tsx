@@ -1,7 +1,12 @@
+import React from "react";
 import { StyleSheet, Text } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
-const SectionHeader = ({ title }) => {
+interface SectionHeaderProps {
+  title: string;
+}
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title }) => {
   const { theme } = useTheme();
   return (
     <Text style={[styles.header, { color: theme.colors.text }]}>{title}</Text>

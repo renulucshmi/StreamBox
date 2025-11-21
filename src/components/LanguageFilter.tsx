@@ -6,10 +6,25 @@
 
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { StyleSheet, View } from "react-native";
+import React from "react";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
-const LanguageFilter = ({
+interface LanguageOption {
+  label: string;
+  value: string;
+}
+
+interface LanguageFilterProps {
+  value: string;
+  onValueChange: (value: string) => void;
+  options?: LanguageOption[];
+  iconName?: keyof typeof Feather.glyphMap;
+  iconSize?: number;
+  style?: ViewStyle;
+}
+
+const LanguageFilter: React.FC<LanguageFilterProps> = ({
   value,
   onValueChange,
   options,
@@ -20,7 +35,7 @@ const LanguageFilter = ({
   const { theme } = useTheme();
 
   // Default language options if none provided
-  const defaultOptions = [
+  const defaultOptions: LanguageOption[] = [
     { label: "All Languages", value: "all" },
     { label: "English", value: "english" },
     { label: "Korean", value: "korean" },

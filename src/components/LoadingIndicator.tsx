@@ -4,10 +4,19 @@
  * Props-based configuration for different loading scenarios
  */
 
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { ActivityIndicator, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
-const LoadingIndicator = ({
+interface LoadingIndicatorProps {
+  size?: "small" | "large";
+  color?: string;
+  text?: string;
+  showText?: boolean;
+  style?: ViewStyle;
+}
+
+const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   size = "large",
   color,
   text = "Loading...",

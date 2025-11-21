@@ -1,4 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import React from "react";
 import {
   Dimensions,
   Image,
@@ -12,11 +13,32 @@ import { useTheme } from "../context/ThemeContext";
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2; // 2 columns with padding
 
-const MovieCard = ({ movie, onPress, isFavourite, onFavouritePress }) => {
+interface Movie {
+  id: string;
+  title: string;
+  poster: string;
+  status: string;
+  rating?: number;
+  language?: string;
+}
+
+interface MovieCardProps {
+  movie: Movie;
+  onPress: () => void;
+  isFavourite?: boolean;
+  onFavouritePress?: (movie: Movie) => void;
+}
+
+const MovieCard: React.FC<MovieCardProps> = ({
+  movie,
+  onPress,
+  isFavourite,
+  onFavouritePress,
+}) => {
   const { theme } = useTheme();
 
   // Get status color based on status type
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case "Popular":
         return "#FF6B6B";

@@ -5,10 +5,22 @@
  */
 
 import { Feather } from "@expo/vector-icons";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import React from "react";
+import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
-const IconButton = ({
+interface IconButtonProps {
+  iconName: keyof typeof Feather.glyphMap;
+  size?: number;
+  color?: string;
+  onPress: () => void;
+  style?: ViewStyle;
+  backgroundColor?: string;
+  disabled?: boolean;
+  activeOpacity?: number;
+}
+
+const IconButton: React.FC<IconButtonProps> = ({
   iconName,
   size = 24,
   color,

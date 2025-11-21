@@ -5,10 +5,20 @@
  */
 
 import { Feather } from "@expo/vector-icons";
-import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
-const EmptyState = ({
+interface EmptyStateProps {
+  iconName?: keyof typeof Feather.glyphMap;
+  iconSize?: number;
+  title?: string;
+  subtitle?: string;
+  iconColor?: string;
+  style?: ViewStyle;
+}
+
+const EmptyState: React.FC<EmptyStateProps> = ({
   iconName = "inbox",
   iconSize = 64,
   title = "No items found",

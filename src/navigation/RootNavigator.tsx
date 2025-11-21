@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -12,15 +13,16 @@ import LoginScreen from "../screens/LoginScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import TrendingScreen from "../screens/TrendingScreen";
+import { RootStackParamList } from "../types/navigation";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const TrendingStack = createNativeStackNavigator();
 const FavouritesStack = createNativeStackNavigator();
 
 // Home Stack Navigator
-function HomeStackNavigator() {
+function HomeStackNavigator(): JSX.Element {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen
@@ -38,7 +40,7 @@ function HomeStackNavigator() {
 }
 
 // Trending Stack Navigator
-function TrendingStackNavigator() {
+function TrendingStackNavigator(): JSX.Element {
   return (
     <TrendingStack.Navigator>
       <TrendingStack.Screen
@@ -56,7 +58,7 @@ function TrendingStackNavigator() {
 }
 
 // Favourites Stack Navigator
-function FavouritesStackNavigator() {
+function FavouritesStackNavigator(): JSX.Element {
   return (
     <FavouritesStack.Navigator>
       <FavouritesStack.Screen
@@ -73,7 +75,7 @@ function FavouritesStackNavigator() {
   );
 }
 
-function MainTabs() {
+function MainTabs(): JSX.Element {
   const { theme } = useTheme();
 
   return (
@@ -95,7 +97,7 @@ function MainTabs() {
           fontWeight: "600",
         },
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+          let iconName: keyof typeof Feather.glyphMap = "home";
 
           if (route.name === "Home") {
             iconName = "home";
@@ -135,7 +137,7 @@ function MainTabs() {
   );
 }
 
-export default function RootNavigator() {
+export default function RootNavigator(): JSX.Element {
   const { user, loading } = useAuth();
   const { theme } = useTheme();
 
