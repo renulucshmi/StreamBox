@@ -8,7 +8,7 @@
     "scheme": "mobileapp224152u",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "main": "App.js",
+    "main": "App.tsx",
     "ios": {
       "supportsTablet": true
     },
