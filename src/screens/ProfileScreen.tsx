@@ -1,11 +1,13 @@
 /**
- * ProfileScreen Component
+ * ProfileScreen Component (TypeScript)
  * Displays user profile information, settings, and navigation options
  * Features: User info, dark mode toggle, navigation to favourites/watch later, logout
  */
 
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React from "react";
 import {
   Alert,
   ScrollView,
@@ -19,20 +21,26 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileRow from "../components/ProfileRow";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import type { RootStackParamList } from "../types/navigation";
 
-export default function ProfileScreen() {
+type ProfileScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Profile"
+>;
+
+const ProfileScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { theme, themeMode, toggleTheme } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   // Get user initials for avatar
-  const getUserInitial = () => {
+  const getUserInitial = (): string => {
     if (!user?.username) return "G";
     return user.username.charAt(0).toUpperCase();
   };
 
   // Handle logout with confirmation
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     Alert.alert(
       "Logout",
       "Are you sure you want to logout?",
@@ -54,19 +62,19 @@ export default function ProfileScreen() {
   };
 
   // Navigate to Favourites screen
-  const navigateToFavourites = () => {
+  const navigateToFavourites = (): void => {
     navigation.navigate("Favourites");
   };
 
   // Navigate to Watch Later screen (placeholder for now)
-  const navigateToWatchLater = () => {
+  const navigateToWatchLater = (): void => {
     Alert.alert("Watch Later", "This feature is coming soon!", [
       { text: "OK" },
     ]);
   };
 
   // Edit profile placeholder
-  const handleEditProfile = () => {
+  const handleEditProfile = (): void => {
     Alert.alert("Edit Profile", "This feature is coming soon!", [
       { text: "OK" },
     ]);
@@ -203,7 +211,7 @@ export default function ProfileScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -296,3 +304,5 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
+
+export default ProfileScreen;

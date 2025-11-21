@@ -1,13 +1,25 @@
 /**
- * ProfileRow Component
+ * ProfileRow Component (TypeScript)
  * Reusable row component for profile settings and options
  */
 
 import { Feather } from "@expo/vector-icons";
+import React from "react";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
-export default function ProfileRow({
+export type ProfileRowProps = {
+  icon: keyof typeof Feather.glyphMap;
+  label: string;
+  onPress?: () => void;
+  showArrow?: boolean;
+  showSwitch?: boolean;
+  switchValue?: boolean;
+  onSwitchChange?: (value: boolean) => void;
+  iconColor?: string;
+};
+
+const ProfileRow: React.FC<ProfileRowProps> = ({
   icon,
   label,
   onPress,
@@ -16,7 +28,7 @@ export default function ProfileRow({
   switchValue = false,
   onSwitchChange,
   iconColor,
-}) {
+}) => {
   const { theme } = useTheme();
 
   const content = (
@@ -74,7 +86,7 @@ export default function ProfileRow({
       {content}
     </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
   row: {
@@ -103,3 +115,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
+export default ProfileRow;
