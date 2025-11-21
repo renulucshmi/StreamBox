@@ -4,7 +4,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { AuthProvider } from "./src/context/AuthContext";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import RootNavigator from "./src/navigation/RootNavigator";
-import { persistor, store } from "./src/store/store";
+import { persistor, store } from "./src/store";
 
 export default function App() {
   return (

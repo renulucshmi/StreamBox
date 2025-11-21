@@ -1,3 +1,11 @@
+/**
+ * Login Screen - Refactored
+ * Following clean architecture principles:
+ * - Uses validation utilities for form validation
+ * - Separated validation logic from UI
+ * - Clean, testable code
+ */
+
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -11,9 +19,12 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { authStyles } from "../styles/authStyles";
+import { isValidForm, validateLoginForm } from "../utils/validation";
 
 export default function LoginScreen({ navigation }) {
   const { login } = useAuth();
+
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,28 +32,14 @@ export default function LoginScreen({ navigation }) {
   const [generalError, setGeneralError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Validate form using utility function
   const validate = () => {
-    const newErrors = {};
-
-    // Email validation with regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = "Enter a valid email address";
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const validationErrors = validateLoginForm({ email, password });
+    setErrors(validationErrors);
+    return isValidForm(validationErrors);
   };
 
+  // Handle login
   const handleLogin = async () => {
     setGeneralError("");
 

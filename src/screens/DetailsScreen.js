@@ -1,8 +1,15 @@
+/**
+ * Details Screen - Refactored
+ * Following clean architecture principles:
+ * - Uses utility functions for color and formatting
+ * - Uses IconButton component
+ * - Separated business logic from JSX
+ */
+
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   Image,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -10,31 +17,41 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import IconButton from "../components/IconButton";
 import { useTheme } from "../context/ThemeContext";
 import {
   addToFavourites,
   removeFromFavourites,
   selectFavourites,
-} from "../store/favouritesSlice";
-import { addToWatchLater, removeFromWatchLater } from "../store/librarySlice";
+} from "../store/slices/favouritesSlice";
+import {
+  addToWatchLater,
+  removeFromWatchLater,
+  selectWatchLater,
+} from "../store/slices/watchLaterSlice";
+import { isMovieInList } from "../utils/helpers";
+import { getStatusColor } from "../utils/movieHelpers";
 
 export default function DetailsScreen({ route, navigation }) {
   const { movie } = route.params;
   const dispatch = useDispatch();
   const { theme, themeMode, toggleTheme } = useTheme();
 
+  // Local state for success messages
   const [showFavouriteSuccess, setShowFavouriteSuccess] = useState(false);
   const [showWatchLaterSuccess, setShowWatchLaterSuccess] = useState(false);
 
-  // Get favourites and watchLater from Redux state
+  // Get data from Redux using selectors
   const favourites = useSelector(selectFavourites);
-  const watchLater = useSelector((state) => state.library.watchLater);
+  const watchLater = useSelector(selectWatchLater);
 
-  // Check if movie is already in favourites or watch later
-  const isFavourite = favourites.some((item) => item.id === movie.id);
-  const isInWatchLater = watchLater.some((item) => item.id === movie.id);
+  // Check if movie is in lists using helper function
+  const isFavourite = isMovieInList(favourites, movie.id);
+  const isInWatchLater = isMovieInList(watchLater, movie.id);
 
+  // Handler functions
   const handleAddToFavourites = () => {
     if (isFavourite) {
       dispatch(removeFromFavourites(movie.id));
@@ -52,22 +69,6 @@ export default function DetailsScreen({ route, navigation }) {
       dispatch(addToWatchLater(movie));
       setShowWatchLaterSuccess(true);
       setTimeout(() => setShowWatchLaterSuccess(false), 2000);
-    }
-  };
-
-  // Get status color
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Popular":
-        return "#FF6B6B";
-      case "Trending":
-        return "#4ECDC4";
-      case "Upcoming":
-        return "#FFD93D";
-      case "Top Rated":
-        return "#6BCB77";
-      default:
-        return "#95A5A6";
     }
   };
 
@@ -90,26 +91,19 @@ export default function DetailsScreen({ route, navigation }) {
           },
         ]}
       >
-        <TouchableOpacity
-          style={styles.backButton}
+        <IconButton
+          iconName="arrow-left"
+          size={24}
           onPress={() => navigation.goBack()}
-        >
-          <Feather name="arrow-left" size={24} color={theme.colors.text} />
-        </TouchableOpacity>
+        />
         <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
           Movie Details
         </Text>
-        <TouchableOpacity
-          style={styles.backButton}
+        <IconButton
+          iconName={themeMode === "dark" ? "sun" : "moon"}
+          size={22}
           onPress={toggleTheme}
-          activeOpacity={0.7}
-        >
-          <Feather
-            name={themeMode === "dark" ? "sun" : "moon"}
-            size={22}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
+        />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -348,12 +342,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
   },
   headerTitle: {
     fontSize: 18,
