@@ -9,7 +9,14 @@
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
-import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../components/EmptyState";
@@ -108,9 +115,14 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         ]}
       >
         <View style={styles.topBarLeft} />
-        <Text style={[styles.appName, { color: theme.colors.text }]}>
-          StreamBox
-        </Text>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/images/StreamBoxLogo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.appName}>StreamBox</Text>
+        </View>
         <IconButton
           iconName={themeMode === "dark" ? "sun" : "moon"}
           size={24}
@@ -198,9 +210,19 @@ const styles = StyleSheet.create({
   topBarLeft: {
     width: 40,
   },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  logo: {
+    width: 48,
+    height: 48,
+  },
   appName: {
     fontSize: 28,
     fontWeight: "bold",
+    color: "#2196F3",
   },
   searchBar: {
     marginHorizontal: 16,

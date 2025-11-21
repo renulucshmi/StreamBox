@@ -10,9 +10,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -82,7 +84,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         keyboardShouldPersistTaps="handled"
       >
         <View style={authStyles.topSection}>
-          <Text style={authStyles.title}>StreamBox</Text>
+          <Image
+            source={require("../../assets/images/StreamBoxLogo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={[authStyles.title, styles.titleBlue]}>StreamBox</Text>
           <Text style={authStyles.subtitle}>Sign in to continue</Text>
         </View>
 
@@ -181,3 +188,15 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 16,
+    alignSelf: "center",
+  },
+  titleBlue: {
+    color: "#2196F3",
+  },
+});
