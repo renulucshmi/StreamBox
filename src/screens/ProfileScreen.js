@@ -187,10 +187,7 @@ export default function ProfileScreen() {
         {/* Logout Button */}
         <View style={styles.logoutContainer}>
           <TouchableOpacity
-            style={[
-              styles.logoutButton,
-              { borderColor: theme.colors.error },
-            ]}
+            style={[styles.logoutButton, { borderColor: theme.colors.error }]}
             onPress={handleLogout}
             activeOpacity={0.7}
           >
@@ -207,7 +204,6 @@ export default function ProfileScreen() {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -300,4 +296,3 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
-
