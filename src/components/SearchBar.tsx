@@ -6,7 +6,13 @@
 
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, TextInput, View, ViewStyle, TextStyle } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
 interface SearchBarProps {

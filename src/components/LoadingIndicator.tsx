@@ -5,7 +5,13 @@
  */
 
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View, ViewStyle } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
 interface LoadingIndicatorProps {
