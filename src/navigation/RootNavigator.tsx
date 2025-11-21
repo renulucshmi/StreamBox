@@ -22,7 +22,7 @@ const TrendingStack = createNativeStackNavigator();
 const FavouritesStack = createNativeStackNavigator();
 
 // Home Stack Navigator
-function HomeStackNavigator(): JSX.Element {
+function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen
@@ -40,7 +40,7 @@ function HomeStackNavigator(): JSX.Element {
 }
 
 // Trending Stack Navigator
-function TrendingStackNavigator(): JSX.Element {
+function TrendingStackNavigator() {
   return (
     <TrendingStack.Navigator>
       <TrendingStack.Screen
@@ -58,7 +58,7 @@ function TrendingStackNavigator(): JSX.Element {
 }
 
 // Favourites Stack Navigator
-function FavouritesStackNavigator(): JSX.Element {
+function FavouritesStackNavigator() {
   return (
     <FavouritesStack.Navigator>
       <FavouritesStack.Screen
@@ -75,7 +75,7 @@ function FavouritesStackNavigator(): JSX.Element {
   );
 }
 
-function MainTabs(): JSX.Element {
+function MainTabs() {
   const { theme } = useTheme();
 
   return (
@@ -137,7 +137,7 @@ function MainTabs(): JSX.Element {
   );
 }
 
-export default function RootNavigator(): JSX.Element {
+export default function RootNavigator() {
   const { user, loading } = useAuth();
   const { theme } = useTheme();
 

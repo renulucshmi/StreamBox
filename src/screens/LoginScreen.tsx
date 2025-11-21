@@ -6,7 +6,8 @@
  * - Clean, testable code
  */
 
-import { useState } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -19,28 +20,38 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { authStyles } from "../styles/authStyles";
+import { RootStackParamList } from "../types/navigation";
 import { isValidForm, validateLoginForm } from "../utils/validation";
 
-export default function LoginScreen({ navigation }) {
+interface LoginScreenProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Login">;
+}
+
+interface ValidationErrors {
+  email?: string;
+  password?: string;
+}
+
+export default function LoginScreen({ navigation }: LoginScreenProps) {
   const { login } = useAuth();
 
   // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Validate form using utility function
-  const validate = () => {
+  const validate = (): boolean => {
     const validationErrors = validateLoginForm({ email, password });
     setErrors(validationErrors);
     return isValidForm(validationErrors);
   };
 
   // Handle login
-  const handleLogin = async () => {
+  const handleLogin = async (): Promise<void> => {
     setGeneralError("");
 
     if (!validate()) {
@@ -52,7 +63,9 @@ export default function LoginScreen({ navigation }) {
     try {
       await login({ email, password });
     } catch (error) {
-      setGeneralError(error.message || "Login failed. Please try again.");
+      setGeneralError(
+        (error as Error).message || "Login failed. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }

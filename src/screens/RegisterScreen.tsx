@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -11,8 +12,20 @@ import {
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { authStyles } from "../styles/authStyles";
+import { RootStackParamList } from "../types/navigation";
 
-export default function RegisterScreen({ navigation }) {
+interface RegisterScreenProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Register">;
+}
+
+interface ValidationErrors {
+  username?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
+export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const { register } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -20,12 +33,12 @@ export default function RegisterScreen({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validate = () => {
-    const newErrors = {};
+  const validate = (): boolean => {
+    const newErrors: ValidationErrors = {};
 
     // Email validation with regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,7 +73,7 @@ export default function RegisterScreen({ navigation }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleRegister = async () => {
+  const handleRegister = async (): Promise<void> => {
     setGeneralError("");
 
     if (!validate()) {
@@ -73,7 +86,7 @@ export default function RegisterScreen({ navigation }) {
       await register({ username, email, password });
     } catch (error) {
       setGeneralError(
-        error.message || "Registration failed. Please try again."
+        (error as Error).message || "Registration failed. Please try again."
       );
     } finally {
       setIsSubmitting(false);
