@@ -1,19 +1,76 @@
+/**
+ * ProfileScreen Component
+ * Displays user profile information, settings, and navigation options
+ * Features: User info, dark mode toggle, navigation to favourites/watch later, logout
+ */
+
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import {
+  Alert,
+  ScrollView,
   StatusBar,
   StyleSheet,
-  Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ProfileRow from "../components/ProfileRow";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const { theme, themeMode, toggleTheme } = useTheme();
+  const navigation = useNavigation();
+
+  // Get user initials for avatar
+  const getUserInitial = () => {
+    if (!user?.username) return "G";
+    return user.username.charAt(0).toUpperCase();
+  };
+
+  // Handle logout with confirmation
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  // Navigate to Favourites screen
+  const navigateToFavourites = () => {
+    navigation.navigate("Favourites");
+  };
+
+  // Navigate to Watch Later screen (placeholder for now)
+  const navigateToWatchLater = () => {
+    Alert.alert("Watch Later", "This feature is coming soon!", [
+      { text: "OK" },
+    ]);
+  };
+
+  // Edit profile placeholder
+  const handleEditProfile = () => {
+    Alert.alert("Edit Profile", "This feature is coming soon!", [
+      { text: "OK" },
+    ]);
+  };
 
   return (
     <SafeAreaView
@@ -24,6 +81,7 @@ export default function ProfileScreen() {
         backgroundColor={theme.colors.surface}
       />
 
+      {/* Header */}
       <View
         style={[
           styles.header,
@@ -38,72 +96,111 @@ export default function ProfileScreen() {
         </Text>
       </View>
 
-      <View style={styles.content}>
-        <View
-          style={[
-            styles.avatarContainer,
-            { backgroundColor: theme.colors.card },
-          ]}
-        >
-          <Feather name="user" size={64} color={theme.colors.primary} />
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* User Info Section */}
+        <View style={styles.userSection}>
+          <View
+            style={[
+              styles.avatarContainer,
+              { backgroundColor: theme.colors.primary },
+            ]}
+          >
+            <Text style={styles.avatarText}>{getUserInitial()}</Text>
+          </View>
+
+          <Text style={[styles.username, { color: theme.colors.text }]}>
+            {user?.username || "Guest User"}
+          </Text>
+          <Text style={[styles.email, { color: theme.colors.textSecondary }]}>
+            {user?.email || "guest@streambox.com"}
+          </Text>
         </View>
 
-        <Text style={[styles.username, { color: theme.colors.text }]}>
-          {user?.username || "Guest"}
-        </Text>
-        <Text style={[styles.email, { color: theme.colors.textSecondary }]}>
-          {user?.email || "guest@streambox.com"}
-        </Text>
-
-        {/* Settings Section */}
-        <View style={styles.settingsSection}>
+        {/* Profile Options Section */}
+        <View style={styles.section}>
           <Text
             style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}
           >
-            Settings
+            Profile Options
           </Text>
-
-          {/* Dark Mode Toggle */}
           <View
             style={[
-              styles.settingRow,
+              styles.rowsContainer,
               {
                 backgroundColor: theme.colors.card,
-                borderBottomColor: theme.colors.border,
+                borderColor: theme.colors.border,
               },
             ]}
           >
-            <View style={styles.settingLeft}>
-              <Feather
-                name={themeMode === "dark" ? "moon" : "sun"}
-                size={20}
-                color={theme.colors.text}
-              />
-              <Text style={[styles.settingText, { color: theme.colors.text }]}>
-                Dark Mode
-              </Text>
-            </View>
-            <Switch
-              value={themeMode === "dark"}
-              onValueChange={toggleTheme}
-              trackColor={{
-                false: "#D1D1D6",
-                true: theme.colors.primary,
-              }}
-              thumbColor="#FFFFFF"
-              ios_backgroundColor="#D1D1D6"
+            <ProfileRow
+              icon="edit-3"
+              label="Edit Profile"
+              onPress={handleEditProfile}
+              showArrow={true}
+            />
+            <ProfileRow
+              icon="heart"
+              label="My Favourites"
+              onPress={navigateToFavourites}
+              showArrow={true}
+              iconColor={theme.colors.error}
+            />
+            <ProfileRow
+              icon="bookmark"
+              label="Watch Later"
+              onPress={navigateToWatchLater}
+              showArrow={true}
             />
           </View>
         </View>
 
-        <TouchableOpacity
-          style={[styles.logoutButton, { backgroundColor: theme.colors.error }]}
-          onPress={logout}
-        >
-          <Feather name="log-out" size={20} color="#fff" />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
+        {/* App Settings Section */}
+        <View style={styles.section}>
+          <Text
+            style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}
+          >
+            App Settings
+          </Text>
+          <View
+            style={[
+              styles.rowsContainer,
+              {
+                backgroundColor: theme.colors.card,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          >
+            <ProfileRow
+              icon={themeMode === "dark" ? "moon" : "sun"}
+              label="Dark Mode"
+              showSwitch={true}
+              switchValue={themeMode === "dark"}
+              onSwitchChange={toggleTheme}
+              showArrow={false}
+            />
+          </View>
+        </View>
+
+        {/* Logout Button */}
+        <View style={styles.logoutContainer}>
+          <TouchableOpacity
+            style={[styles.logoutButton, { borderColor: theme.colors.error }]}
+            onPress={handleLogout}
+            activeOpacity={0.7}
+          >
+            <Feather name="log-out" size={20} color={theme.colors.error} />
+            <Text style={[styles.logoutText, { color: theme.colors.error }]}>
+              Logout
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Footer Spacing */}
+        <View style={styles.footer} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -118,74 +215,84 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
+    letterSpacing: -0.5,
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  userSection: {
     alignItems: "center",
-    paddingTop: 40,
+    paddingTop: 32,
+    paddingBottom: 24,
   },
   avatarContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  avatarText: {
+    fontSize: 42,
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   username: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   email: {
-    fontSize: 16,
-    marginBottom: 32,
+    fontSize: 15,
+    marginBottom: 8,
   },
-  settingsSection: {
-    width: "90%",
-    marginTop: 8,
+  section: {
+    paddingHorizontal: 20,
     marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: "600",
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
     marginBottom: 12,
     marginLeft: 4,
   },
-  settingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+  rowsContainer: {
     borderRadius: 12,
-    marginBottom: 8,
-    borderBottomWidth: 1,
+    overflow: "hidden",
+    borderWidth: 1,
   },
-  settingLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  settingText: {
-    fontSize: 16,
-    fontWeight: "600",
+  logoutContainer: {
+    paddingHorizontal: 20,
+    marginTop: 8,
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 32,
-    paddingVertical: 12,
+    justifyContent: "center",
+    paddingVertical: 14,
     borderRadius: 12,
-    gap: 8,
+    borderWidth: 2,
+    gap: 10,
   },
   logoutText: {
-    color: "#fff",
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "600",
+  },
+  footer: {
+    height: 40,
   },
 });
