@@ -7,9 +7,10 @@
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React from "react";
+import React, { useState } from "react";
 import {
-  Alert,
+  Modal,
+  Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -32,6 +33,9 @@ const ProfileScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { theme, themeMode, toggleTheme } = useTheme();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showComingSoonDialog, setShowComingSoonDialog] = useState(false);
+  const [comingSoonTitle, setComingSoonTitle] = useState("");
 
   // Get user initials for avatar
   const getUserInitial = (): string => {
@@ -41,24 +45,12 @@ const ProfileScreen: React.FC = () => {
 
   // Handle logout with confirmation
   const handleLogout = (): void => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: async () => {
-            await logout();
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+    setShowLogoutDialog(true);
+  };
+
+  const confirmLogout = async (): Promise<void> => {
+    setShowLogoutDialog(false);
+    await logout();
   };
 
   // Navigate to Favourites screen
@@ -68,16 +60,14 @@ const ProfileScreen: React.FC = () => {
 
   // Navigate to Watch Later screen (placeholder for now)
   const navigateToWatchLater = (): void => {
-    Alert.alert("Watch Later", "This feature is coming soon!", [
-      { text: "OK" },
-    ]);
+    setComingSoonTitle("Watch Later");
+    setShowComingSoonDialog(true);
   };
 
   // Edit profile placeholder
   const handleEditProfile = (): void => {
-    Alert.alert("Edit Profile", "This feature is coming soon!", [
-      { text: "OK" },
-    ]);
+    setComingSoonTitle("Edit Profile");
+    setShowComingSoonDialog(true);
   };
 
   return (
@@ -209,6 +199,115 @@ const ProfileScreen: React.FC = () => {
         {/* Footer Spacing */}
         <View style={styles.footer} />
       </ScrollView>
+
+      {/* Logout Confirmation Dialog */}
+      <Modal
+        visible={showLogoutDialog}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowLogoutDialog(false)}
+      >
+        <Pressable
+          style={styles.dialogOverlay}
+          onPress={() => setShowLogoutDialog(false)}
+        >
+          <View
+            style={[
+              styles.dialogContent,
+              { backgroundColor: theme.colors.card },
+            ]}
+            onStartShouldSetResponder={() => true}
+          >
+            <Text style={[styles.dialogTitle, { color: theme.colors.text }]}>
+              Logout
+            </Text>
+            <Text
+              style={[
+                styles.dialogMessage,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Are you sure you want to logout?
+            </Text>
+            <View style={styles.dialogButtons}>
+              <TouchableOpacity
+                style={styles.dialogButton}
+                onPress={() => setShowLogoutDialog(false)}
+              >
+                <Text
+                  style={[
+                    styles.dialogButtonText,
+                    { color: theme.colors.primary },
+                  ]}
+                >
+                  CANCEL
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.dialogButton}
+                onPress={confirmLogout}
+              >
+                <Text
+                  style={[
+                    styles.dialogButtonText,
+                    { color: theme.colors.primary },
+                  ]}
+                >
+                  LOGOUT
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* Coming Soon Dialog */}
+      <Modal
+        visible={showComingSoonDialog}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowComingSoonDialog(false)}
+      >
+        <Pressable
+          style={styles.dialogOverlay}
+          onPress={() => setShowComingSoonDialog(false)}
+        >
+          <View
+            style={[
+              styles.dialogContent,
+              { backgroundColor: theme.colors.card },
+            ]}
+            onStartShouldSetResponder={() => true}
+          >
+            <Text style={[styles.dialogTitle, { color: theme.colors.text }]}>
+              {comingSoonTitle}
+            </Text>
+            <Text
+              style={[
+                styles.dialogMessage,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              This feature is coming soon!
+            </Text>
+            <View style={styles.dialogButtons}>
+              <TouchableOpacity
+                style={styles.dialogButton}
+                onPress={() => setShowComingSoonDialog(false)}
+              >
+                <Text
+                  style={[
+                    styles.dialogButtonText,
+                    { color: theme.colors.primary },
+                  ]}
+                >
+                  OK
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -302,6 +401,46 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: 40,
+  },
+  dialogOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dialogContent: {
+    width: "85%",
+    borderRadius: 16,
+    padding: 24,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+  },
+  dialogTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  dialogMessage: {
+    fontSize: 16,
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  dialogButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 16,
+  },
+  dialogButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  dialogButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
 });
 
