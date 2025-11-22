@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import DetailsScreen from "../screens/DetailsScreen";
@@ -103,6 +104,7 @@ function ProfileStackNavigator() {
 
 function MainTabs() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -114,8 +116,8 @@ function MainTabs() {
           backgroundColor: theme.colors.tabBar,
           borderTopWidth: 1,
           borderTopColor: theme.colors.tabBarBorder,
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom + 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
