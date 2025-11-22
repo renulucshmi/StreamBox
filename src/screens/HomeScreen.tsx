@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -18,7 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../components/EmptyState";
-import LanguageFilter from "../components/LanguageFilter";
+import LanguageChip from "../components/LanguageChip";
 import LoadingIndicator from "../components/LoadingIndicator";
 import MovieCard from "../components/MovieCard";
 import SearchBar from "../components/SearchBar";
@@ -31,8 +32,6 @@ import {
 } from "../store/slices/favouritesSlice";
 import { AppDispatch } from "../store/store";
 import { RootStackParamList } from "../types/navigation";
-import { filterMovies } from "../utils/helpers";
-import { getSectionTitle } from "../utils/movieHelpers";
 
 interface HomeScreenProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -47,7 +46,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [movies, setMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [languageFilter, setLanguageFilter] = useState<string>("all");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+
+  // Available languages
+  const availableLanguages = ["English", "Korean", "Spanish", "French"];
 
   // Fetch movies on component mount
   useEffect(() => {
@@ -67,8 +69,29 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }
   };
 
-  // Filter movies using helper function
-  const filteredMovies = filterMovies(movies, searchQuery, languageFilter);
+  // Toggle language selection
+  const toggleLanguage = (language: string) => {
+    setSelectedLanguages((prev) =>
+      prev.includes(language)
+        ? prev.filter((lang) => lang !== language)
+        : [...prev, language]
+    );
+  };
+
+  // Filter movies based on search and selected languages
+  const filteredMovies = movies.filter((movie) => {
+    // Search filter
+    const matchesSearch = movie.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    // Language filter - if no languages selected, show all
+    const matchesLanguage =
+      selectedLanguages.length === 0 ||
+      selectedLanguages.includes(movie.language);
+
+    return matchesSearch && matchesLanguage;
+  });
 
   // Navigation handler
   const handleMoviePress = (movie: any) => {
@@ -89,8 +112,18 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const isFavourite = (movieId: any): boolean =>
     favourites.some((item) => item.id === movieId);
 
-  // Get section title using helper
-  const sectionTitle = getSectionTitle(searchQuery, languageFilter);
+  // Get section title
+  const getSectionTitle = () => {
+    if (searchQuery) {
+      return "Search Results";
+    }
+    if (selectedLanguages.length > 0) {
+      return selectedLanguages.length === 1
+        ? `${selectedLanguages[0]} Movies`
+        : "Selected Languages";
+    }
+    return "All Movies";
+  };
 
   return (
     <SafeAreaView
@@ -144,24 +177,33 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         />
       </View>
 
-      {/* Language Filter */}
-      <View style={styles.filterSection}>
+      {/* Language Chips */}
+      <View style={styles.chipsSection}>
         <Text
-          style={[styles.filterLabel, { color: theme.colors.textSecondary }]}
+          style={[styles.chipsLabel, { color: theme.colors.textSecondary }]}
         >
-          Language
+          LANGUAGES
         </Text>
-        <LanguageFilter
-          value={languageFilter}
-          onValueChange={setLanguageFilter}
-          style={styles.languageFilter}
-        />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsContainer}
+        >
+          {availableLanguages.map((language) => (
+            <LanguageChip
+              key={language}
+              label={language}
+              selected={selectedLanguages.includes(language)}
+              onPress={() => toggleLanguage(language)}
+            />
+          ))}
+        </ScrollView>
       </View>
 
       {/* Section Header */}
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-          {sectionTitle}
+          {getSectionTitle()}
         </Text>
         <Text
           style={[
@@ -253,21 +295,21 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 1,
   },
-  filterSection: {
-    paddingHorizontal: 16,
+  chipsSection: {
     paddingTop: 12,
     paddingBottom: 8,
   },
-  filterLabel: {
+  chipsLabel: {
     fontSize: 13,
     fontWeight: "600",
-    marginBottom: 8,
-    marginLeft: 4,
-    textTransform: "uppercase",
+    marginBottom: 10,
+    marginLeft: 20,
     letterSpacing: 0.5,
   },
-  languageFilter: {
-    marginHorizontal: 0,
+  chipsContainer: {
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   sectionHeader: {
     paddingHorizontal: 16,

@@ -1,11 +1,18 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import LanguageChip from "../components/LanguageChip";
 import MovieCard from "../components/MovieCard";
 import SectionHeader from "../components/SectionHeader";
-import ThemedPicker from "../components/ThemedPicker";
 import { useTheme } from "../context/ThemeContext";
 import {
   addToFavourites,
@@ -132,15 +139,27 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
   const dispatch = useDispatch<AppDispatch>();
   const favourites = useSelector(selectFavourites);
   const { theme } = useTheme();
-  const [filter, setFilter] = useState<string>("all"); // all, english, korean, spanish
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 
-  // Filter data based on selected language
+  // Available languages
+  const availableLanguages = ["English", "Korean", "Spanish", "French"];
+
+  // Toggle language selection
+  const toggleLanguage = (language: string) => {
+    setSelectedLanguages((prev) =>
+      prev.includes(language)
+        ? prev.filter((lang) => lang !== language)
+        : [...prev, language]
+    );
+  };
+
+  // Filter data based on selected languages
   const getFilteredData = (): TrendingMovie[] => {
-    if (filter === "all") {
+    if (selectedLanguages.length === 0) {
       return TRENDING_DATA;
     }
-    return TRENDING_DATA.filter(
-      (item) => item.language.toLowerCase() === filter.toLowerCase()
+    return TRENDING_DATA.filter((item) =>
+      selectedLanguages.includes(item.language)
     );
   };
 
@@ -195,21 +214,28 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
         </Text>
       </View>
 
-      {/* Language Filter Dropdown */}
-      <ThemedPicker
-        value={filter}
-        onValueChange={(itemValue: string) => setFilter(itemValue)}
-        items={[
-          { label: "All Languages", value: "all" },
-          { label: "English", value: "english" },
-          { label: "Korean", value: "korean" },
-          { label: "Spanish", value: "spanish" },
-          { label: "German", value: "german" },
-        ]}
-        iconName="globe"
-        iconSize={18}
-        style={styles.filterContainer}
-      />
+      {/* Language Chips */}
+      <View style={styles.chipsSection}>
+        <Text
+          style={[styles.chipsLabel, { color: theme.colors.textSecondary }]}
+        >
+          LANGUAGES
+        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsContainer}
+        >
+          {availableLanguages.map((language) => (
+            <LanguageChip
+              key={language}
+              label={language}
+              selected={selectedLanguages.includes(language)}
+              onPress={() => toggleLanguage(language)}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
       {/* Movie Grid */}
       <FlatList
@@ -225,7 +251,7 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
             <Text
               style={[styles.emptyText, { color: theme.colors.textTertiary }]}
             >
-              No {filter} available
+              No movies found
             </Text>
           </View>
         }
@@ -262,10 +288,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
   },
-  filterContainer: {
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 12,
+  chipsSection: {
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  chipsLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 10,
+    marginLeft: 20,
+    letterSpacing: 0.5,
+  },
+  chipsContainer: {
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   gridContainer: {
     paddingHorizontal: 12,
