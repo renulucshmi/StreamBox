@@ -32,10 +32,10 @@ import {
   selectWatchLater,
 } from "../store/slices/watchLaterSlice";
 import { AppDispatch } from "../store/store";
-import { getStatusColor } from "../utils/movieHelpers";
+import { Movie } from "../types/movie";
 
 export default function DetailsScreen({ route, navigation }: any) {
-  const { movie } = route.params;
+  const { movie }: { movie: Movie } = route.params;
   const dispatch = useDispatch<AppDispatch>();
   const { theme, themeMode, toggleTheme } = useTheme();
 
@@ -50,13 +50,15 @@ export default function DetailsScreen({ route, navigation }: any) {
   const watchLater = useSelector(selectWatchLater);
 
   // Check if movie is in lists
-  const isFavourite = favourites.some((item) => item.id === movie.id);
-  const isInWatchLater = watchLater.some((item) => item.id === movie.id);
+  const isFavourite = favourites.some((item) => String(item.id) === movie.id);
+  const isInWatchLater = watchLater.some(
+    (item) => String(item.id) === movie.id
+  );
 
   // Handler functions
   const handleAddToFavourites = () => {
     if (isFavourite) {
-      dispatch(removeFromFavourites(movie.id));
+      dispatch(removeFromFavourites(movie.id as any));
     } else {
       dispatch(addToFavourites(movie as any));
       setShowFavouriteSuccess(true);
@@ -66,7 +68,7 @@ export default function DetailsScreen({ route, navigation }: any) {
 
   const handleAddToWatchLater = () => {
     if (isInWatchLater) {
-      dispatch(removeFromWatchLater(movie.id));
+      dispatch(removeFromWatchLater(movie.id as any));
     } else {
       dispatch(addToWatchLater(movie as any));
       setShowWatchLaterSuccess(true);
@@ -112,7 +114,7 @@ export default function DetailsScreen({ route, navigation }: any) {
         {/* Movie Poster */}
         <View style={styles.posterContainer}>
           <Image
-            source={{ uri: movie.poster }}
+            source={{ uri: movie.posterUrl }}
             style={styles.poster}
             resizeMode="cover"
           />
@@ -127,15 +129,12 @@ export default function DetailsScreen({ route, navigation }: any) {
               <Text style={styles.languageText}>{movie.language}</Text>
             </View>
           )}
-          {/* Status Pill */}
-          <View
-            style={[
-              styles.statusPill,
-              { backgroundColor: getStatusColor(movie.status) },
-            ]}
-          >
-            <Text style={styles.statusText}>{movie.status}</Text>
-          </View>
+          {/* Trending Pill */}
+          {movie.isTrending && (
+            <View style={styles.trendingPill}>
+              <Text style={styles.trendingText}>TRENDING</Text>
+            </View>
+          )}
         </View>
 
         {/* Movie Info */}
@@ -176,10 +175,9 @@ export default function DetailsScreen({ route, navigation }: any) {
             <Text
               style={[styles.overview, { color: theme.colors.textSecondary }]}
             >
-              {movie.overview ||
-                `${
-                  movie.title
-                } is a ${movie.status.toLowerCase()} movie that has captivated audiences worldwide. With stunning visuals and compelling storytelling, this film delivers an unforgettable cinematic experience. The talented cast brings the characters to life in ways that will keep you engaged from start to finish.`}
+              {`${movie.title} is a captivating ${
+                movie.genres[0] || "movie"
+              } that has captivated audiences worldwide. With stunning visuals and compelling storytelling, this film delivers an unforgettable cinematic experience. The talented cast brings the characters to life in ways that will keep you engaged from start to finish.`}
             </Text>
           </View>
 
@@ -218,15 +216,10 @@ export default function DetailsScreen({ route, navigation }: any) {
                   { color: theme.colors.textSecondary },
                 ]}
               >
-                Status:
+                Genres:
               </Text>
-              <Text
-                style={[
-                  styles.detailValue,
-                  { color: getStatusColor(movie.status) },
-                ]}
-              >
-                {movie.status}
+              <Text style={[styles.detailValue, { color: theme.colors.text }]}>
+                {movie.genres.join(", ") || "N/A"}
               </Text>
             </View>
             <View
@@ -244,7 +237,7 @@ export default function DetailsScreen({ route, navigation }: any) {
                 Rating:
               </Text>
               <Text style={[styles.detailValue, { color: theme.colors.text }]}>
-                {movie.rating ? `${movie.rating}/10` : "N/A"}
+                {movie.rating ? `${movie.rating.toFixed(1)}/10` : "N/A"}
               </Text>
             </View>
           </View>
@@ -372,15 +365,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#FFFFFF",
   },
-  statusPill: {
+  trendingPill: {
     position: "absolute",
     top: 16,
     right: 16,
+    backgroundColor: "#ff5252",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
   },
-  statusText: {
+  trendingText: {
     fontSize: 12,
     fontWeight: "700",
     color: "#FFFFFF",

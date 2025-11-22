@@ -5,17 +5,11 @@
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import {
-  FlatList,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../components/EmptyState";
-import FilterBar from "../components/filters/FilterBar";
+import FilterPanel from "../components/filters/FilterPanel";
 import MovieCard from "../components/MovieCard";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -24,9 +18,13 @@ import {
   selectFavourites,
 } from "../store/slices/favouritesSlice";
 import { AppDispatch } from "../store/store";
-import { RootStackParamList } from "../types/navigation";
 import { Movie } from "../types/movie";
-import { filterMovies, getUniqueGenres, getUniqueLanguages } from "../utils/movieFilters";
+import { RootStackParamList } from "../types/navigation";
+import {
+  filterMovies,
+  getUniqueGenres,
+  getUniqueLanguages,
+} from "../utils/movieFilters";
 
 interface TrendingScreenProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Trending">;
@@ -37,7 +35,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t1",
     title: "The Dark Knight",
-    posterUrl: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     rating: 9.0,
     language: "English",
     genres: ["Action", "Crime"],
@@ -46,7 +45,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t2",
     title: "Inception",
-    posterUrl: "https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
     rating: 8.8,
     language: "English",
     genres: ["Sci-Fi", "Thriller"],
@@ -55,7 +55,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t3",
     title: "Parasite",
-    posterUrl: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
     rating: 8.5,
     language: "Korean",
     genres: ["Thriller", "Drama"],
@@ -64,7 +65,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t4",
     title: "Money Heist",
-    posterUrl: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
     rating: 8.2,
     language: "Spanish",
     genres: ["Crime", "Action"],
@@ -73,7 +75,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t5",
     title: "Amélie",
-    posterUrl: "https://image.tmdb.org/t/p/w500/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg",
     rating: 8.3,
     language: "French",
     genres: ["Romance", "Comedy"],
@@ -82,7 +85,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t6",
     title: "Squid Game",
-    posterUrl: "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg",
     rating: 8.0,
     language: "Korean",
     genres: ["Drama", "Thriller"],
@@ -91,7 +95,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t7",
     title: "Fight Club",
-    posterUrl: "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
     rating: 8.8,
     language: "English",
     genres: ["Drama", "Thriller"],
@@ -100,7 +105,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t8",
     title: "Narcos",
-    posterUrl: "https://image.tmdb.org/t/p/w500/rTmal9fDbwh5F0waol2hq35U4ah.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/rTmal9fDbwh5F0waol2hq35U4ah.jpg",
     rating: 8.8,
     language: "Spanish",
     genres: ["Crime", "Drama"],
@@ -109,7 +115,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t9",
     title: "The Shawshank Redemption",
-    posterUrl: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
     rating: 9.3,
     language: "English",
     genres: ["Drama"],
@@ -118,7 +125,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t10",
     title: "Your Name",
-    posterUrl: "https://image.tmdb.org/t/p/w500/q719jXXEzOoYaps6babgKnONONX.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/q719jXXEzOoYaps6babgKnONONX.jpg",
     rating: 8.4,
     language: "Japanese",
     genres: ["Animation", "Romance"],
@@ -127,7 +135,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t11",
     title: "Spirited Away",
-    posterUrl: "https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
     rating: 8.6,
     language: "Japanese",
     genres: ["Animation", "Fantasy"],
@@ -136,7 +145,8 @@ const TRENDING_DATA: Movie[] = [
   {
     id: "t12",
     title: "Elite",
-    posterUrl: "https://image.tmdb.org/t/p/w500/3SWXeXvFW0KNXcriTlx0YQT0C1S.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/3SWXeXvFW0KNXcriTlx0YQT0C1S.jpg",
     rating: 7.5,
     language: "Spanish",
     genres: ["Drama", "Thriller"],
@@ -169,9 +179,7 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
   // Toggle genre selection
   const toggleGenre = (genre: string) => {
     setSelectedGenres((prev) =>
-      prev.includes(genre)
-        ? prev.filter((g) => g !== genre)
-        : [...prev, genre]
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
     );
   };
 
@@ -216,14 +224,16 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
           <Text style={[styles.title, { color: theme.colors.text }]}>
             Trending Now
           </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+          <Text
+            style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+          >
             Most popular movies this week
           </Text>
         </View>
       </View>
 
-      {/* Filter Bar */}
-      <FilterBar
+      {/* Filter Panel */}
+      <FilterPanel
         availableLanguages={availableLanguages}
         selectedLanguages={selectedLanguages}
         onToggleLanguage={toggleLanguage}
@@ -234,8 +244,11 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
 
       {/* Results Count */}
       <View style={styles.resultsHeader}>
-        <Text style={[styles.resultsText, { color: theme.colors.textSecondary }]}>
-          {filteredMovies.length} {filteredMovies.length === 1 ? "movie" : "movies"}
+        <Text
+          style={[styles.resultsText, { color: theme.colors.textSecondary }]}
+        >
+          {filteredMovies.length}{" "}
+          {filteredMovies.length === 1 ? "movie" : "movies"}
         </Text>
       </View>
 

@@ -18,7 +18,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../components/EmptyState";
-import FilterBar from "../components/filters/FilterBar";
+import FilterPanel from "../components/filters/FilterPanel";
 import LoadingIndicator from "../components/LoadingIndicator";
 import MovieCard from "../components/MovieCard";
 import SearchBar from "../components/SearchBar";
@@ -69,7 +69,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         id: String(m.id),
         title: m.title,
         language: m.language || "English",
-        genres: m.genres || ["Drama"],
+        genres: m.genres || [],
         rating: m.rating || 0,
         posterUrl: m.poster || "",
         isTrending: false,
@@ -196,8 +196,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         />
       </View>
 
-      {/* Filter Bar */}
-      <FilterBar
+      {/* Filter Panel */}
+      <FilterPanel
         availableLanguages={availableLanguages}
         selectedLanguages={selectedLanguages}
         onToggleLanguage={toggleLanguage}
