@@ -163,9 +163,12 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
-  // Derive available languages and genres from trending data
-  const availableLanguages = getUniqueLanguages(TRENDING_DATA);
-  const availableGenres = getUniqueGenres(TRENDING_DATA);
+  // Filter to only trending movies first
+  const trendingOnlyMovies = TRENDING_DATA.filter((movie) => movie.isTrending);
+
+  // Derive available languages and genres from trending-only movies
+  const availableLanguages = getUniqueLanguages(trendingOnlyMovies);
+  const availableGenres = getUniqueGenres(trendingOnlyMovies);
 
   // Toggle language selection
   const toggleLanguage = (language: string) => {
@@ -183,9 +186,9 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
     );
   };
 
-  // Filter movies based on language and genre
+  // Apply language/genre filters to trending movies
   const filteredMovies = filterMovies(
-    TRENDING_DATA,
+    trendingOnlyMovies,
     selectedLanguages,
     selectedGenres
   );

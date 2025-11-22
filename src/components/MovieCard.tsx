@@ -4,7 +4,7 @@
  */
 
 import { FontAwesome } from "@expo/vector-icons";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -38,6 +38,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
   const { theme } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const heartScaleAnim = useRef(new Animated.Value(1)).current;
+  const [imageError, setImageError] = useState(false);
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -87,8 +88,36 @@ const MovieCard: React.FC<MovieCardProps> = ({
       >
         {/* Poster Container */}
         <View style={styles.posterContainer}>
-          {/* Poster Image */}
-          <Image source={{ uri: movie.posterUrl }} style={styles.poster} />
+          {/* Poster Image with Error Handling */}
+          {!imageError ? (
+            <Image
+              source={{ uri: movie.posterUrl }}
+              style={styles.poster}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <View
+              style={[
+                styles.poster,
+                styles.placeholderContainer,
+                { backgroundColor: theme.colors.background },
+              ]}
+            >
+              <FontAwesome
+                name="film"
+                size={48}
+                color={theme.colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.placeholderText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                No Image
+              </Text>
+            </View>
+          )}
 
           {/* Top Pills and Tags */}
           <View style={styles.topRow}>
@@ -192,6 +221,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: CARD_WIDTH * 1.5, // 3:2 aspect ratio
     resizeMode: "cover",
+  },
+  placeholderContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderText: {
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 8,
   },
   topRow: {
     position: "absolute",
