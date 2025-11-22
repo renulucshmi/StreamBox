@@ -1,12 +1,15 @@
 /**
- * Details Screen - Refactored
- * Following clean architecture principles:
- * - Uses utility functions for color and formatting
- * - Uses IconButton component
- * - Separated business logic from JSX
+ * Details Screen - Modern & Clean Refactor
+ * Features:
+ * - Heart icon on poster for favourite toggle
+ * - Gradient overlay on poster for better readability
+ * - Removed Watch Later button
+ * - Clean info card layout for details
+ * - Toast notification for favourite changes
  */
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import {
   Image,
@@ -26,52 +29,34 @@ import {
   removeFromFavourites,
   selectFavourites,
 } from "../store/slices/favouritesSlice";
-import {
-  addToWatchLater,
-  removeFromWatchLater,
-  selectWatchLater,
-} from "../store/slices/watchLaterSlice";
 import { AppDispatch } from "../store/store";
-import { getStatusColor } from "../utils/movieHelpers";
+import { Movie } from "../types/movie";
 
 export default function DetailsScreen({ route, navigation }: any) {
-  const { movie } = route.params;
+  const { movie }: { movie: Movie } = route.params;
   const dispatch = useDispatch<AppDispatch>();
   const { theme, themeMode, toggleTheme } = useTheme();
 
-  // Local state for success messages
-  const [showFavouriteSuccess, setShowFavouriteSuccess] =
-    useState<boolean>(false);
-  const [showWatchLaterSuccess, setShowWatchLaterSuccess] =
-    useState<boolean>(false);
+  // Local state for toast message
+  const [toastMessage, setToastMessage] = useState<string>("");
 
   // Get data from Redux using selectors
   const favourites = useSelector(selectFavourites);
-  const watchLater = useSelector(selectWatchLater);
 
-  // Check if movie is in lists
-  const isFavourite = favourites.some((item) => item.id === movie.id);
-  const isInWatchLater = watchLater.some((item) => item.id === movie.id);
+  // Check if movie is favourite
+  const isFavourite = favourites.some((item) => String(item.id) === movie.id);
 
-  // Handler functions
-  const handleAddToFavourites = () => {
+  // Handler function for favourite toggle
+  const handleToggleFavourite = () => {
     if (isFavourite) {
       dispatch(removeFromFavourites(movie.id));
+      setToastMessage("Removed from favourites");
     } else {
       dispatch(addToFavourites(movie as any));
-      setShowFavouriteSuccess(true);
-      setTimeout(() => setShowFavouriteSuccess(false), 2000);
+      setToastMessage("Added to favourites");
     }
-  };
-
-  const handleAddToWatchLater = () => {
-    if (isInWatchLater) {
-      dispatch(removeFromWatchLater(movie.id));
-    } else {
-      dispatch(addToWatchLater(movie as any));
-      setShowWatchLaterSuccess(true);
-      setTimeout(() => setShowWatchLaterSuccess(false), 2000);
-    }
+    // Hide toast after 2 seconds
+    setTimeout(() => setToastMessage(""), 2000);
   };
 
   return (
@@ -109,33 +94,46 @@ export default function DetailsScreen({ route, navigation }: any) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Movie Poster */}
+        {/* Movie Poster with Hero Section */}
         <View style={styles.posterContainer}>
           <Image
-            source={{ uri: movie.poster }}
+            source={{ uri: movie.posterUrl }}
             style={styles.poster}
             resizeMode="cover"
           />
+
+          {/* Gradient Overlay */}
+          <LinearGradient
+            colors={["transparent", "rgba(0,0,0,0.45)"]}
+            style={styles.posterGradient}
+          />
+
           {/* Language Pill */}
           {movie.language && (
-            <View
-              style={[
-                styles.languagePill,
-                { backgroundColor: theme.colors.overlay },
-              ]}
-            >
+            <View style={styles.languagePill}>
               <Text style={styles.languageText}>{movie.language}</Text>
             </View>
           )}
-          {/* Status Pill */}
-          <View
-            style={[
-              styles.statusPill,
-              { backgroundColor: getStatusColor(movie.status) },
-            ]}
+
+          {/* Trending Pill */}
+          {movie.isTrending && (
+            <View style={styles.trendingPill}>
+              <Text style={styles.trendingText}>TRENDING</Text>
+            </View>
+          )}
+
+          {/* Favourite Heart Icon */}
+          <TouchableOpacity
+            style={styles.favouriteIcon}
+            onPress={handleToggleFavourite}
+            activeOpacity={0.8}
           >
-            <Text style={styles.statusText}>{movie.status}</Text>
-          </View>
+            <MaterialCommunityIcons
+              name={isFavourite ? "heart" : "heart-outline"}
+              size={26}
+              color={isFavourite ? "#ff5252" : "#FFFFFF"}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Movie Info */}
@@ -153,7 +151,7 @@ export default function DetailsScreen({ route, navigation }: any) {
           {/* Rating */}
           {movie.rating && (
             <View style={styles.ratingContainer}>
-              <Feather name="star" size={20} color="#FFD93D" />
+              <Feather name="star" size={22} color="#f3a000" fill="#f3a000" />
               <Text style={[styles.rating, { color: theme.colors.text }]}>
                 {movie.rating}
               </Text>
@@ -176,158 +174,89 @@ export default function DetailsScreen({ route, navigation }: any) {
             <Text
               style={[styles.overview, { color: theme.colors.textSecondary }]}
             >
-              {movie.overview ||
-                `${
-                  movie.title
-                } is a ${movie.status.toLowerCase()} movie that has captivated audiences worldwide. With stunning visuals and compelling storytelling, this film delivers an unforgettable cinematic experience. The talented cast brings the characters to life in ways that will keep you engaged from start to finish.`}
+              {`${movie.title} is a captivating ${
+                movie.genres[0] || "movie"
+              } that has captivated audiences worldwide. With stunning visuals and compelling storytelling, this film delivers an unforgettable cinematic experience. The talented cast brings the characters to life in ways that will keep you engaged from start to finish.`}
             </Text>
           </View>
 
-          {/* Details */}
+          {/* Details Card */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
               Details
             </Text>
             <View
               style={[
-                styles.detailRow,
-                { borderBottomColor: theme.colors.border },
+                styles.detailsCard,
+                { backgroundColor: theme.colors.card },
               ]}
             >
-              <Text
+              <View
                 style={[
-                  styles.detailLabel,
-                  { color: theme.colors.textSecondary },
+                  styles.detailRow,
+                  { borderBottomColor: theme.colors.border },
                 ]}
               >
-                Language:
-              </Text>
-              <Text style={[styles.detailValue, { color: theme.colors.text }]}>
-                {movie.language || "N/A"}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.detailRow,
-                { borderBottomColor: theme.colors.border },
-              ]}
-            >
-              <Text
+                <Text
+                  style={[
+                    styles.detailLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Language
+                </Text>
+                <Text
+                  style={[styles.detailValue, { color: theme.colors.text }]}
+                >
+                  {movie.language || "N/A"}
+                </Text>
+              </View>
+              <View
                 style={[
-                  styles.detailLabel,
-                  { color: theme.colors.textSecondary },
+                  styles.detailRow,
+                  { borderBottomColor: theme.colors.border },
                 ]}
               >
-                Status:
-              </Text>
-              <Text
-                style={[
-                  styles.detailValue,
-                  { color: getStatusColor(movie.status) },
-                ]}
-              >
-                {movie.status}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.detailRow,
-                { borderBottomColor: theme.colors.border },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.detailLabel,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                Rating:
-              </Text>
-              <Text style={[styles.detailValue, { color: theme.colors.text }]}>
-                {movie.rating ? `${movie.rating}/10` : "N/A"}
-              </Text>
+                <Text
+                  style={[
+                    styles.detailLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Genres
+                </Text>
+                <Text
+                  style={[styles.detailValue, { color: theme.colors.text }]}
+                >
+                  {movie.genres.join(", ") || "N/A"}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text
+                  style={[
+                    styles.detailLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Rating
+                </Text>
+                <Text
+                  style={[styles.detailValue, { color: theme.colors.text }]}
+                >
+                  {movie.rating ? `${movie.rating.toFixed(1)}/10` : "N/A"}
+                </Text>
+              </View>
             </View>
           </View>
-
-          {/* Action Buttons */}
-          <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={[
-                styles.actionButton,
-                {
-                  backgroundColor: theme.colors.card,
-                  shadowColor: theme.colors.shadowColor,
-                },
-                isFavourite && styles.actionButtonActive,
-              ]}
-              onPress={handleAddToFavourites}
-            >
-              <Feather
-                name="heart"
-                size={20}
-                color={isFavourite ? "#FF6B6B" : theme.colors.textSecondary}
-                fill={isFavourite ? "#FF6B6B" : "transparent"}
-              />
-              <Text
-                style={[
-                  styles.actionButtonText,
-                  { color: theme.colors.text },
-                  isFavourite && styles.actionButtonTextActive,
-                ]}
-              >
-                {isFavourite ? "Remove from Favourites" : "Add to Favourites"}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.actionButton,
-                {
-                  backgroundColor: theme.colors.card,
-                  shadowColor: theme.colors.shadowColor,
-                },
-                isInWatchLater && styles.actionButtonActive,
-              ]}
-              onPress={handleAddToWatchLater}
-            >
-              <Feather
-                name="bookmark"
-                size={20}
-                color={
-                  isInWatchLater
-                    ? theme.colors.primary
-                    : theme.colors.textSecondary
-                }
-                fill={isInWatchLater ? theme.colors.primary : "transparent"}
-              />
-              <Text
-                style={[
-                  styles.actionButtonText,
-                  { color: theme.colors.text },
-                  isInWatchLater && styles.actionButtonTextActive,
-                ]}
-              >
-                {isInWatchLater
-                  ? "Remove from Watch Later"
-                  : "Add to Watch Later"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Success Messages */}
-          {showFavouriteSuccess && (
-            <View style={styles.successMessage}>
-              <Feather name="check-circle" size={16} color="#6BCB77" />
-              <Text style={styles.successText}>Added to Favourites!</Text>
-            </View>
-          )}
-          {showWatchLaterSuccess && (
-            <View style={styles.successMessage}>
-              <Feather name="check-circle" size={16} color="#6BCB77" />
-              <Text style={styles.successText}>Added to Watch Later!</Text>
-            </View>
-          )}
         </View>
+
+        {/* Toast Message */}
+        {toastMessage !== "" && (
+          <View style={styles.toast}>
+            <Feather name="check-circle" size={18} color="#FFFFFF" />
+            <Text style={styles.toastText}>{toastMessage}</Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -359,10 +288,18 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  posterGradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 200,
+  },
   languagePill: {
     position: "absolute",
     top: 16,
     left: 16,
+    backgroundColor: "rgba(0,0,0,0.6)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -372,19 +309,31 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#FFFFFF",
   },
-  statusPill: {
+  trendingPill: {
     position: "absolute",
-    top: 16,
-    right: 16,
+    top: 60,
+    left: 16,
+    backgroundColor: "#ff5252",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
   },
-  statusText: {
+  trendingText: {
     fontSize: 12,
     fontWeight: "700",
     color: "#FFFFFF",
     textTransform: "uppercase",
+  },
+  favouriteIcon: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    width: 48,
+    height: 48,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
   },
   infoContainer: {
     padding: 20,
@@ -393,19 +342,20 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 12,
+    lineHeight: 36,
   },
   ratingContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 28,
   },
   rating: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     marginLeft: 8,
   },
   ratingOutOf: {
-    fontSize: 16,
+    fontSize: 18,
     marginLeft: 4,
   },
   section: {
@@ -413,67 +363,55 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "700",
     marginBottom: 12,
+    marginTop: 4,
   },
   overview: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 26,
+  },
+  detailsCard: {
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
   },
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 8,
+    alignItems: "center",
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   detailLabel: {
     fontSize: 16,
+    fontWeight: "400",
   },
   detailValue: {
     fontSize: 16,
     fontWeight: "600",
+    flex: 1,
+    textAlign: "right",
+    marginLeft: 16,
   },
-  actionButtons: {
-    marginTop: 8,
-    gap: 12,
-  },
-  actionButton: {
+  toast: {
+    position: "absolute",
+    bottom: 100,
+    left: "10%",
+    right: "10%",
+    backgroundColor: "rgba(0,0,0,0.85)",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 30,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-    gap: 12,
+    gap: 10,
+    alignSelf: "center",
   },
-  actionButtonActive: {
-    opacity: 0.8,
-  },
-  actionButtonText: {
-    fontSize: 16,
+  toastText: {
+    fontSize: 15,
     fontWeight: "600",
-  },
-  actionButtonTextActive: {
-    fontWeight: "700",
-  },
-  successMessage: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#E8F5E9",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginTop: 16,
-    gap: 8,
-  },
-  successText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#6BCB77",
+    color: "#FFFFFF",
   },
 });

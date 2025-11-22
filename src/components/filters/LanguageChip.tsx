@@ -1,11 +1,11 @@
 /**
- * LanguageChip - Multi-select chip component with scale animation
- * Features: Toggle selection, theme-aware, smooth scale feedback
+ * LanguageChip - Multi-select language filter chip
+ * Features: Scale animation, theme-aware styling
  */
 
 import { useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text } from "react-native";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../../context/ThemeContext";
 
 interface LanguageChipProps {
   label: string;
@@ -37,7 +37,6 @@ const LanguageChip: React.FC<LanguageChipProps> = ({
     }).start();
   };
 
-  // Colors based on selection and theme
   const chipBackground = selected
     ? "#2b8eff"
     : themeMode === "dark"
@@ -52,20 +51,12 @@ const LanguageChip: React.FC<LanguageChipProps> = ({
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={[
-          styles.chip,
-          {
-            backgroundColor: chipBackground,
-          },
-        ]}
+        style={[styles.chip, { backgroundColor: chipBackground }]}
       >
         <Text
           style={[
             styles.chipText,
-            {
-              color: textColor,
-              fontWeight: selected ? "700" : "600",
-            },
+            { color: textColor, fontWeight: selected ? "700" : "600" },
           ]}
         >
           {label}

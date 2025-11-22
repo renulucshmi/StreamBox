@@ -11,6 +11,7 @@ interface DummyMovie {
   status: "Popular" | "Trending" | "Top Rated";
   rating: number;
   language: string;
+  genres: string[];
 }
 
 // Dummy TMDB-style movie data
@@ -22,6 +23,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Popular",
     rating: 9.0,
     language: "English",
+    genres: ["Action", "Crime", "Drama"],
   },
   {
     id: "2",
@@ -30,6 +32,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Trending",
     rating: 8.8,
     language: "English",
+    genres: ["Action", "Sci-Fi", "Thriller"],
   },
   {
     id: "3",
@@ -38,6 +41,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Top Rated",
     rating: 8.5,
     language: "Korean",
+    genres: ["Drama", "Thriller"],
   },
   {
     id: "4",
@@ -46,6 +50,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Popular",
     rating: 8.7,
     language: "English",
+    genres: ["Action", "Sci-Fi"],
   },
   {
     id: "5",
@@ -54,6 +59,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Popular",
     rating: 8.3,
     language: "French",
+    genres: ["Comedy", "Romance"],
   },
   {
     id: "6",
@@ -62,6 +68,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Trending",
     rating: 8.8,
     language: "English",
+    genres: ["Drama", "Thriller"],
   },
   {
     id: "7",
@@ -70,6 +77,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Popular",
     rating: 8.2,
     language: "Spanish",
+    genres: ["Action", "Crime", "Drama"],
   },
   {
     id: "8",
@@ -78,6 +86,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Top Rated",
     rating: 9.2,
     language: "English",
+    genres: ["Crime", "Drama"],
   },
   {
     id: "9",
@@ -86,6 +95,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Top Rated",
     rating: 8.4,
     language: "Korean",
+    genres: ["Action", "Drama", "Thriller"],
   },
   {
     id: "10",
@@ -94,6 +104,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Trending",
     rating: 8.0,
     language: "Korean",
+    genres: ["Action", "Drama", "Thriller"],
   },
   {
     id: "11",
@@ -102,6 +113,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Popular",
     rating: 8.4,
     language: "English",
+    genres: ["Action", "Adventure", "Sci-Fi"],
   },
   {
     id: "12",
@@ -110,6 +122,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Trending",
     rating: 8.7,
     language: "German",
+    genres: ["Drama", "Mystery", "Sci-Fi"],
   },
   {
     id: "13",
@@ -118,6 +131,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Popular",
     rating: 8.8,
     language: "Spanish",
+    genres: ["Crime", "Drama", "Thriller"],
   },
   {
     id: "14",
@@ -126,6 +140,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Trending",
     rating: 8.6,
     language: "English",
+    genres: ["Biography", "Drama", "History"],
   },
   {
     id: "15",
@@ -134,6 +149,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Popular",
     rating: 8.5,
     language: "French",
+    genres: ["Biography", "Comedy", "Drama"],
   },
   {
     id: "16",
@@ -142,6 +158,7 @@ const DUMMY_MOVIES_DATA: DummyMovie[] = [
     status: "Trending",
     rating: 7.6,
     language: "Korean",
+    genres: ["Action", "Horror", "Thriller"],
   },
 ];
 

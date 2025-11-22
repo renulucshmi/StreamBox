@@ -1,18 +1,17 @@
+/**
+ * TrendingScreen - Unified Design with Genre + Language Filtering
+ * Features: FilterBar component, TRENDING tag only, clean card design
+ */
+
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import {
-  FlatList,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import LanguageChip from "../components/LanguageChip";
+import EmptyState from "../components/EmptyState";
+import FilterPanel from "../components/filters/FilterPanel";
+import IconButton from "../components/IconButton";
 import MovieCard from "../components/MovieCard";
-import SectionHeader from "../components/SectionHeader";
 import { useTheme } from "../context/ThemeContext";
 import {
   addToFavourites,
@@ -20,129 +19,157 @@ import {
   selectFavourites,
 } from "../store/slices/favouritesSlice";
 import { AppDispatch } from "../store/store";
+import { Movie } from "../types/movie";
 import { RootStackParamList } from "../types/navigation";
-
-interface TrendingMovie {
-  id: string;
-  title: string;
-  poster: string;
-  rating: number;
-  status: string;
-  language: string;
-}
+import {
+  filterMovies,
+  getUniqueGenres,
+  getUniqueLanguages,
+} from "../utils/movieFilters";
 
 interface TrendingScreenProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Trending">;
 }
 
-// Extended dummy data for trending movies and series with language filters
-const TRENDING_DATA: TrendingMovie[] = [
+// Trending movies data with isTrending flag
+const TRENDING_DATA: Movie[] = [
   {
-    id: "1",
+    id: "t1",
     title: "The Dark Knight",
-    poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     rating: 9.0,
-    status: "Trending",
     language: "English",
+    genres: ["Action", "Crime"],
+    isTrending: true,
   },
   {
-    id: "2",
+    id: "t2",
     title: "Inception",
-    poster: "https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
     rating: 8.8,
-    status: "Trending",
     language: "English",
+    genres: ["Sci-Fi", "Thriller"],
+    isTrending: true,
   },
   {
-    id: "3",
+    id: "t3",
     title: "Parasite",
-    poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
     rating: 8.5,
-    status: "Top Rated",
     language: "Korean",
+    genres: ["Thriller", "Drama"],
+    isTrending: true,
   },
   {
-    id: "4",
+    id: "t4",
     title: "Money Heist",
-    poster: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
     rating: 8.2,
-    status: "Popular",
     language: "Spanish",
+    genres: ["Crime", "Action"],
+    isTrending: false,
   },
   {
-    id: "5",
+    id: "t5",
     title: "Amélie",
-    poster: "https://image.tmdb.org/t/p/w500/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg",
     rating: 8.3,
-    status: "Popular",
     language: "French",
+    genres: ["Romance", "Comedy"],
+    isTrending: false,
   },
   {
-    id: "6",
+    id: "t6",
     title: "Squid Game",
-    poster: "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg",
     rating: 8.0,
-    status: "Trending",
     language: "Korean",
+    genres: ["Drama", "Thriller"],
+    isTrending: true,
   },
   {
-    id: "7",
+    id: "t7",
     title: "Fight Club",
-    poster: "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
     rating: 8.8,
-    status: "Trending",
     language: "English",
+    genres: ["Drama", "Thriller"],
+    isTrending: false,
   },
   {
-    id: "8",
+    id: "t8",
     title: "Narcos",
-    poster: "https://image.tmdb.org/t/p/w500/rTmal9fDbwh5F0waol2hq35U4ah.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/rTmal9fDbwh5F0waol2hq35U4ah.jpg",
     rating: 8.8,
-    status: "Popular",
     language: "Spanish",
+    genres: ["Crime", "Drama"],
+    isTrending: true,
   },
   {
-    id: "9",
+    id: "t9",
     title: "The Shawshank Redemption",
-    poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
     rating: 9.3,
-    status: "Top Rated",
     language: "English",
+    genres: ["Drama"],
+    isTrending: true,
   },
   {
-    id: "10",
-    title: "Dark",
-    poster: "https://image.tmdb.org/t/p/w500/5J8bKRQkw5R0oRh2UWA2JmMFS2U.jpg",
-    rating: 8.7,
-    status: "Popular",
-    language: "German",
+    id: "t10",
+    title: "Your Name",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/q719jXXEzOoYaps6babgKnONONX.jpg",
+    rating: 8.4,
+    language: "Japanese",
+    genres: ["Animation", "Romance"],
+    isTrending: false,
   },
   {
-    id: "11",
-    title: "Interstellar",
-    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-    rating: 8.7,
-    status: "Trending",
-    language: "English",
+    id: "t11",
+    title: "Spirited Away",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+    rating: 8.6,
+    language: "Japanese",
+    genres: ["Animation", "Fantasy"],
+    isTrending: true,
   },
   {
-    id: "12",
-    title: "Train to Busan",
-    poster: "https://image.tmdb.org/t/p/w500/5mCiMdlZjJ1CNoXKRsWPCLAzcCj.jpg",
-    rating: 7.6,
-    status: "Popular",
-    language: "Korean",
+    id: "t12",
+    title: "Elite",
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/3SWXeXvFW0KNXcriTlx0YQT0C1S.jpg",
+    rating: 7.5,
+    language: "Spanish",
+    genres: ["Drama", "Thriller"],
+    isTrending: false,
   },
 ];
 
 export default function TrendingScreen({ navigation }: TrendingScreenProps) {
   const dispatch = useDispatch<AppDispatch>();
   const favourites = useSelector(selectFavourites);
-  const { theme } = useTheme();
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const { theme, themeMode, toggleTheme } = useTheme();
 
-  // Available languages
-  const availableLanguages = ["English", "Korean", "Spanish", "French"];
+  // Local state
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+
+  // Filter to only trending movies first
+  const trendingOnlyMovies = TRENDING_DATA.filter((movie) => movie.isTrending);
+
+  // Derive available languages and genres from trending-only movies
+  const availableLanguages = getUniqueLanguages(trendingOnlyMovies);
+  const availableGenres = getUniqueGenres(trendingOnlyMovies);
 
   // Toggle language selection
   const toggleLanguage = (language: string) => {
@@ -153,49 +180,38 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
     );
   };
 
-  // Filter data based on selected languages
-  const getFilteredData = (): TrendingMovie[] => {
-    if (selectedLanguages.length === 0) {
-      return TRENDING_DATA;
-    }
-    return TRENDING_DATA.filter((item) =>
-      selectedLanguages.includes(item.language)
+  // Toggle genre selection
+  const toggleGenre = (genre: string) => {
+    setSelectedGenres((prev) =>
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
     );
   };
 
-  const filteredData = getFilteredData();
+  // Apply language/genre filters to trending movies
+  const filteredMovies = filterMovies(
+    trendingOnlyMovies,
+    selectedLanguages,
+    selectedGenres
+  );
 
-  const handleMoviePress = (movie: any) => {
+  // Navigation handler
+  const handleMoviePress = (movie: Movie) => {
     navigation.navigate("Details", { movie });
   };
 
-  const handleFavouritePress = (movie: any) => {
-    const isFavourite = favourites.some(
-      (item) => String(item.id) === String(movie.id)
-    );
-    if (isFavourite) {
-      dispatch(removeFromFavourites(movie.id));
+  // Favourite toggle handler
+  const handleToggleFavourite = (movie: Movie) => {
+    const isFav = favourites.some((item) => item.id === movie.id);
+    if (isFav) {
+      dispatch(removeFromFavourites(movie.id as any));
     } else {
       dispatch(addToFavourites(movie as any));
     }
   };
 
-  const isFavourite = (movieId: any): boolean => {
-    return favourites.some((item) => String(item.id) === String(movieId));
-  };
-
-  const renderMovieItem = ({ item }: { item: TrendingMovie }) => {
-    return (
-      <View style={styles.gridItem}>
-        <MovieCard
-          movie={item}
-          onPress={() => handleMoviePress(item)}
-          isFavourite={isFavourite(item.id)}
-          onFavouritePress={handleFavouritePress}
-        />
-      </View>
-    );
-  };
+  // Check if movie is favourite
+  const isFavourite = (movieId: string): boolean =>
+    favourites.some((item) => String(item.id) === movieId);
 
   return (
     <SafeAreaView
@@ -203,57 +219,73 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
     >
       <StatusBar
         barStyle={theme.colors.statusBar}
-        backgroundColor={theme.colors.surface}
+        backgroundColor={theme.colors.background}
       />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
-        <SectionHeader title="Trending Now" />
-        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-          Most popular movies this week
-        </Text>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              Trending Now
+            </Text>
+            <Text
+              style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+            >
+              Most popular movies this week
+            </Text>
+          </View>
+          <IconButton
+            iconName={themeMode === "dark" ? "sun" : "moon"}
+            size={22}
+            onPress={toggleTheme}
+          />
+        </View>
       </View>
 
-      {/* Language Chips */}
-      <View style={styles.chipsSection}>
+      {/* Filter Panel */}
+      <FilterPanel
+        availableLanguages={availableLanguages}
+        selectedLanguages={selectedLanguages}
+        onToggleLanguage={toggleLanguage}
+        availableGenres={availableGenres}
+        selectedGenres={selectedGenres}
+        onToggleGenre={toggleGenre}
+      />
+
+      {/* Results Count */}
+      <View style={styles.resultsHeader}>
         <Text
-          style={[styles.chipsLabel, { color: theme.colors.textSecondary }]}
+          style={[styles.resultsText, { color: theme.colors.textSecondary }]}
         >
-          LANGUAGES
+          {filteredMovies.length}{" "}
+          {filteredMovies.length === 1 ? "movie" : "movies"}
         </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chipsContainer}
-        >
-          {availableLanguages.map((language) => (
-            <LanguageChip
-              key={language}
-              label={language}
-              selected={selectedLanguages.includes(language)}
-              onPress={() => toggleLanguage(language)}
-            />
-          ))}
-        </ScrollView>
       </View>
 
       {/* Movie Grid */}
       <FlatList
-        data={filteredData}
+        data={filteredMovies}
         keyExtractor={(item) => item.id}
-        renderItem={renderMovieItem}
+        renderItem={({ item }) => (
+          <MovieCard
+            movie={item}
+            onPress={() => handleMoviePress(item)}
+            isFavourite={isFavourite(item.id)}
+            onToggleFavourite={() => handleToggleFavourite(item)}
+            showTrendingTag={true}
+          />
+        )}
         numColumns={2}
-        contentContainerStyle={styles.gridContainer}
-        columnWrapperStyle={styles.row}
+        contentContainerStyle={styles.movieGrid}
+        columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text
-              style={[styles.emptyText, { color: theme.colors.textTertiary }]}
-            >
-              No movies found
-            </Text>
-          </View>
+          <EmptyState
+            iconName="trending-up"
+            title="No trending movies"
+            subtitle="Try adjusting your filters"
+          />
         }
       />
     </SafeAreaView>
@@ -266,64 +298,38 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingTop: 20,
+    paddingBottom: 12,
   },
   headerContent: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
-  headerTextContainer: {
-    flex: 1,
-  },
-  themeToggleButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 12,
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    marginBottom: 4,
+    letterSpacing: -0.5,
   },
   subtitle: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  resultsHeader: {
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+  },
+  resultsText: {
     fontSize: 14,
-    marginTop: 4,
+    fontWeight: "500",
   },
-  chipsSection: {
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  chipsLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    marginBottom: 10,
-    marginLeft: 20,
-    letterSpacing: 0.5,
-  },
-  chipsContainer: {
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  gridContainer: {
-    paddingHorizontal: 12,
-    paddingTop: 8,
+  movieGrid: {
+    paddingHorizontal: 8,
     paddingBottom: 20,
   },
-  row: {
+  columnWrapper: {
     justifyContent: "space-between",
-    paddingHorizontal: 4,
-  },
-  gridItem: {
-    width: "48%",
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 16,
-    textAlign: "center",
+    paddingHorizontal: 8,
   },
 });
