@@ -1,6 +1,6 @@
 /**
- * Home Screen - Modern & Premium Design
- * Features: Polished UI, improved spacing, better visual hierarchy, fade-in animations
+ * Home Screen - Unified Design with Genre + Language Filtering
+ * Features: FilterBar component, clean card design, no status tags
  */
 
 import { Feather } from "@expo/vector-icons";
@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -19,7 +18,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../components/EmptyState";
-import LanguageChip from "../components/LanguageChip";
+import FilterBar from "../components/filters/FilterBar";
 import LoadingIndicator from "../components/LoadingIndicator";
 import MovieCard from "../components/MovieCard";
 import SearchBar from "../components/SearchBar";
@@ -31,7 +30,13 @@ import {
   selectFavourites,
 } from "../store/slices/favouritesSlice";
 import { AppDispatch } from "../store/store";
+import { Movie } from "../types/movie";
 import { RootStackParamList } from "../types/navigation";
+import {
+  filterMovies,
+  getUniqueGenres,
+  getUniqueLanguages,
+} from "../utils/movieFilters";
 
 interface HomeScreenProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -44,30 +49,42 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   // Local state
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [movies, setMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-
-  // Available languages
-  const availableLanguages = ["English", "Korean", "Spanish", "French"];
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
   // Fetch movies on component mount
   useEffect(() => {
     loadMovies();
   }, []);
 
-  // Load movies from service
+  // Load movies from service (convert to Movie type)
   const loadMovies = async () => {
     try {
       setLoading(true);
       const data = await fetchMovies();
-      setMovies(data);
+      // Convert API data to Movie type
+      const convertedMovies: Movie[] = data.map((m: any) => ({
+        id: String(m.id),
+        title: m.title,
+        language: m.language || "English",
+        genres: m.genres || ["Drama"],
+        rating: m.rating || 0,
+        posterUrl: m.poster || "",
+        isTrending: false,
+      }));
+      setMovies(convertedMovies);
     } catch (error) {
       console.error("Error fetching movies:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Derive available languages and genres from movies
+  const availableLanguages = getUniqueLanguages(movies);
+  const availableGenres = getUniqueGenres(movies);
 
   // Toggle language selection
   const toggleLanguage = (language: string) => {
@@ -78,49 +95,51 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     );
   };
 
-  // Filter movies based on search and selected languages
-  const filteredMovies = movies.filter((movie) => {
-    // Search filter
-    const matchesSearch = movie.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+  // Toggle genre selection
+  const toggleGenre = (genre: string) => {
+    setSelectedGenres((prev) =>
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
+    );
+  };
 
-    // Language filter - if no languages selected, show all
-    const matchesLanguage =
-      selectedLanguages.length === 0 ||
-      selectedLanguages.includes(movie.language);
+  // Filter movies based on search, language, and genre
+  const filteredBySearch = movies.filter((movie) =>
+    movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-    return matchesSearch && matchesLanguage;
-  });
+  const filteredMovies = filterMovies(
+    filteredBySearch,
+    selectedLanguages,
+    selectedGenres
+  );
 
   // Navigation handler
-  const handleMoviePress = (movie: any) => {
+  const handleMoviePress = (movie: Movie) => {
     navigation.navigate("Details", { movie });
   };
 
   // Favourite toggle handler
-  const handleFavouritePress = (movie: any) => {
+  const handleToggleFavourite = (movie: Movie) => {
     const isFav = favourites.some((item) => item.id === movie.id);
     if (isFav) {
-      dispatch(removeFromFavourites(movie.id));
+      dispatch(removeFromFavourites(movie.id as any));
     } else {
-      dispatch(addToFavourites(movie));
+      dispatch(addToFavourites(movie as any));
     }
   };
 
   // Check if movie is favourite
-  const isFavourite = (movieId: any): boolean =>
-    favourites.some((item) => item.id === movieId);
+  const isFavourite = (movieId: string): boolean =>
+    favourites.some((item) => String(item.id) === movieId);
 
   // Get section title
   const getSectionTitle = () => {
     if (searchQuery) {
       return "Search Results";
     }
-    if (selectedLanguages.length > 0) {
-      return selectedLanguages.length === 1
-        ? `${selectedLanguages[0]} Movies`
-        : "Selected Languages";
+    const filterCount = selectedLanguages.length + selectedGenres.length;
+    if (filterCount > 0) {
+      return "Filtered Movies";
     }
     return "All Movies";
   };
@@ -177,28 +196,15 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         />
       </View>
 
-      {/* Language Chips */}
-      <View style={styles.chipsSection}>
-        <Text
-          style={[styles.chipsLabel, { color: theme.colors.textSecondary }]}
-        >
-          LANGUAGES
-        </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chipsContainer}
-        >
-          {availableLanguages.map((language) => (
-            <LanguageChip
-              key={language}
-              label={language}
-              selected={selectedLanguages.includes(language)}
-              onPress={() => toggleLanguage(language)}
-            />
-          ))}
-        </ScrollView>
-      </View>
+      {/* Filter Bar */}
+      <FilterBar
+        availableLanguages={availableLanguages}
+        selectedLanguages={selectedLanguages}
+        onToggleLanguage={toggleLanguage}
+        availableGenres={availableGenres}
+        selectedGenres={selectedGenres}
+        onToggleGenre={toggleGenre}
+      />
 
       {/* Section Header */}
       <View style={styles.sectionHeader}>
@@ -223,13 +229,13 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         <FlatList
           data={filteredMovies}
           keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <MovieCard
               movie={item}
               onPress={() => handleMoviePress(item)}
               isFavourite={isFavourite(item.id)}
-              onFavouritePress={handleFavouritePress}
-              index={index}
+              onToggleFavourite={() => handleToggleFavourite(item)}
+              showTrendingTag={false}
             />
           )}
           numColumns={2}
@@ -295,25 +301,9 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 1,
   },
-  chipsSection: {
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  chipsLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    marginBottom: 10,
-    marginLeft: 20,
-    letterSpacing: 0.5,
-  },
-  chipsContainer: {
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
   sectionHeader: {
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   sectionTitle: {
@@ -333,6 +323,5 @@ const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: "space-between",
     paddingHorizontal: 8,
-    marginBottom: 16,
   },
 });
