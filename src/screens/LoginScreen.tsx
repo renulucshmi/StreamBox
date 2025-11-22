@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { RootStackParamList } from "../types/navigation";
 import { isValidForm, validateLoginForm } from "../utils/validation";
 
@@ -33,6 +34,7 @@ interface ValidationErrors {
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
   const { login } = useAuth();
+  const { theme } = useTheme();
 
   // Form state
   const [email, setEmail] = useState("");
@@ -72,7 +74,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardView}
+      style={[
+        styles.keyboardView,
+        { backgroundColor: theme.colors.background },
+      ]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -89,12 +94,26 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.title}>StreamBox</Text>
-            <Text style={styles.subtitle}>Sign in to continue</Text>
+            <Text style={[styles.title, { color: theme.colors.primary }]}>
+              StreamBox
+            </Text>
+            <Text
+              style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+            >
+              Sign in to continue
+            </Text>
           </View>
 
           {/* Card Section */}
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: theme.colors.card,
+                shadowColor: theme.colors.shadowColor,
+              },
+            ]}
+          >
             {generalError ? (
               <View style={styles.errorBanner}>
                 <Text style={styles.errorBannerText}>{generalError}</Text>
@@ -103,11 +122,21 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
             {/* Email Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={[styles.label, { color: theme.colors.text }]}>
+                Email
+              </Text>
               <TextInput
-                style={[styles.input, errors.email && styles.inputError]}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                    color: theme.colors.text,
+                  },
+                  errors.email && styles.inputError,
+                ]}
                 placeholder="Enter your email"
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.colors.textTertiary}
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
@@ -126,16 +155,23 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
             {/* Password Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={[styles.label, { color: theme.colors.text }]}>
+                Password
+              </Text>
               <View style={styles.passwordWrapper}>
                 <TextInput
                   style={[
                     styles.input,
                     styles.passwordInput,
+                    {
+                      backgroundColor: theme.colors.surface,
+                      borderColor: theme.colors.border,
+                      color: theme.colors.text,
+                    },
                     errors.password && styles.inputError,
                   ]}
                   placeholder="Enter your password"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={theme.colors.textTertiary}
                   value={password}
                   onChangeText={(text) => {
                     setPassword(text);
@@ -155,7 +191,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                   <Feather
                     name={showPassword ? "eye-off" : "eye"}
                     size={20}
-                    color="#666"
+                    color={theme.colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -168,6 +204,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             <TouchableOpacity
               style={[
                 styles.loginButton,
+                {
+                  backgroundColor: theme.colors.primary,
+                  shadowColor: theme.colors.primary,
+                },
                 isSubmitting && styles.loginButtonDisabled,
               ]}
               onPress={handleLogin}
@@ -184,10 +224,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
           {/* Footer Text */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>
+            <Text
+              style={[styles.footerText, { color: theme.colors.textSecondary }]}
+            >
               Don't have an account?{" "}
               <Text
-                style={styles.footerLink}
+                style={[styles.footerLink, { color: theme.colors.primary }]}
                 onPress={() => !isSubmitting && navigation.navigate("Register")}
               >
                 Register
@@ -203,7 +245,6 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
-    backgroundColor: "#f5f7fa",
   },
   scrollView: {
     flex: 1,
@@ -229,20 +270,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#2196F3",
     marginBottom: 8,
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
     fontWeight: "500",
   },
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 24,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -268,18 +305,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#333",
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "#f8f9fb",
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#e2e5ea",
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: "#333",
   },
   inputError: {
     borderColor: "#ff4d4d",
@@ -304,13 +337,11 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   loginButton: {
-    backgroundColor: "#2196F3",
     borderRadius: 22,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 8,
-    shadowColor: "#2196F3",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -331,10 +362,8 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 15,
-    color: "#666",
   },
   footerLink: {
-    color: "#2196F3",
     fontWeight: "600",
   },
 });

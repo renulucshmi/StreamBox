@@ -1,10 +1,29 @@
+import { ActivityIndicator, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { AuthProvider } from "./src/context/AuthContext";
-import { ThemeProvider } from "./src/context/ThemeContext";
+import { ThemeProvider, useTheme } from "./src/context/ThemeContext";
 import RootNavigator from "./src/navigation/RootNavigator";
 import { persistor, store } from "./src/store";
+
+function AppContent() {
+  const { loading } = useTheme();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#2196F3" />
+      </View>
+    );
+  }
+
+  return (
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
+  );
+}
 
 export default function App() {
   return (
@@ -12,9 +31,7 @@ export default function App() {
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaProvider>
           <ThemeProvider>
-            <AuthProvider>
-              <RootNavigator />
-            </AuthProvider>
+            <AppContent />
           </ThemeProvider>
         </SafeAreaProvider>
       </PersistGate>
