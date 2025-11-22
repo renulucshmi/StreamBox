@@ -1,3 +1,9 @@
+/**
+ * Register Screen - Modern & Professional Design
+ * Features: iOS-style floating card, enhanced spacing, Feather icon toggles for password visibility
+ */
+
+import { Feather } from "@expo/vector-icons";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import {
@@ -13,7 +19,6 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
-import { authStyles } from "../styles/authStyles";
 import { RootStackParamList } from "../types/navigation";
 
 interface RegisterScreenProps {
@@ -97,173 +102,190 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={styles.keyboardView}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        style={authStyles.container}
-        contentContainerStyle={{ flexGrow: 1 }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <View style={authStyles.topSection}>
-          <Image
-            source={require("../../assets/images/StreamBoxLogo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={[authStyles.title, styles.titleBlue]}>StreamBox</Text>
-          <Text style={authStyles.subtitle}>Create your account</Text>
-        </View>
+        <View style={styles.container}>
+          {/* Logo & Heading Section */}
+          <View style={styles.headerSection}>
+            <Image
+              source={require("../../assets/images/StreamBoxLogo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>StreamBox</Text>
+            <Text style={styles.subtitle}>Create your account</Text>
+          </View>
 
-        <View style={authStyles.card}>
-          {generalError ? (
-            <View style={authStyles.generalError}>
-              <Text style={authStyles.generalErrorText}>{generalError}</Text>
+          {/* Card Section */}
+          <View style={styles.card}>
+            {generalError ? (
+              <View style={styles.errorBanner}>
+                <Text style={styles.errorBannerText}>{generalError}</Text>
+              </View>
+            ) : null}
+
+            {/* Username Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Username</Text>
+              <TextInput
+                style={[styles.input, errors.username && styles.inputError]}
+                placeholder="Choose a username"
+                placeholderTextColor="#999"
+                value={username}
+                onChangeText={(text) => {
+                  setUsername(text);
+                  if (errors.username) {
+                    setErrors({ ...errors, username: "" });
+                  }
+                }}
+                autoCapitalize="none"
+                editable={!isSubmitting}
+              />
+              {errors.username ? (
+                <Text style={styles.errorText}>{errors.username}</Text>
+              ) : null}
             </View>
-          ) : null}
 
-          <View style={authStyles.inputContainer}>
-            <Text style={authStyles.inputLabel}>Username</Text>
-            <TextInput
+            {/* Email Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={[styles.input, errors.email && styles.inputError]}
+                placeholder="Enter your email"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  if (errors.email) {
+                    setErrors({ ...errors, email: "" });
+                  }
+                }}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!isSubmitting}
+              />
+              {errors.email ? (
+                <Text style={styles.errorText}>{errors.email}</Text>
+              ) : null}
+            </View>
+
+            {/* Password Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Password</Text>
+              <View style={styles.passwordWrapper}>
+                <TextInput
+                  style={[
+                    styles.input,
+                    styles.passwordInput,
+                    errors.password && styles.inputError,
+                  ]}
+                  placeholder="Create a password"
+                  placeholderTextColor="#999"
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    if (errors.password) {
+                      setErrors({ ...errors, password: "" });
+                    }
+                  }}
+                  secureTextEntry={!showPassword}
+                  editable={!isSubmitting}
+                />
+                <TouchableOpacity
+                  style={styles.eyeIcon}
+                  onPress={() => setShowPassword(!showPassword)}
+                  disabled={isSubmitting}
+                  activeOpacity={0.7}
+                >
+                  <Feather
+                    name={showPassword ? "eye-off" : "eye"}
+                    size={20}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+              </View>
+              {errors.password ? (
+                <Text style={styles.errorText}>{errors.password}</Text>
+              ) : null}
+            </View>
+
+            {/* Confirm Password Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <View style={styles.passwordWrapper}>
+                <TextInput
+                  style={[
+                    styles.input,
+                    styles.passwordInput,
+                    errors.confirmPassword && styles.inputError,
+                  ]}
+                  placeholder="Re-enter your password"
+                  placeholderTextColor="#999"
+                  value={confirmPassword}
+                  onChangeText={(text) => {
+                    setConfirmPassword(text);
+                    if (errors.confirmPassword) {
+                      setErrors({ ...errors, confirmPassword: "" });
+                    }
+                  }}
+                  secureTextEntry={!showConfirmPassword}
+                  editable={!isSubmitting}
+                />
+                <TouchableOpacity
+                  style={styles.eyeIcon}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={isSubmitting}
+                  activeOpacity={0.7}
+                >
+                  <Feather
+                    name={showConfirmPassword ? "eye-off" : "eye"}
+                    size={20}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+              </View>
+              {errors.confirmPassword ? (
+                <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+              ) : null}
+            </View>
+
+            {/* Create Account Button */}
+            <TouchableOpacity
               style={[
-                authStyles.input,
-                errors.username && authStyles.inputError,
+                styles.registerButton,
+                isSubmitting && styles.registerButtonDisabled,
               ]}
-              placeholder="Choose a username"
-              placeholderTextColor="#999999"
-              value={username}
-              onChangeText={(text) => {
-                setUsername(text);
-                if (errors.username) {
-                  setErrors({ ...errors, username: "" });
-                }
-              }}
-              autoCapitalize="none"
-              editable={!isSubmitting}
-            />
-            {errors.username ? (
-              <Text style={authStyles.errorText}>{errors.username}</Text>
-            ) : null}
-          </View>
-
-          <View style={authStyles.inputContainer}>
-            <Text style={authStyles.inputLabel}>Email</Text>
-            <TextInput
-              style={[authStyles.input, errors.email && authStyles.inputError]}
-              placeholder="Enter your email"
-              placeholderTextColor="#999999"
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                if (errors.email) {
-                  setErrors({ ...errors, email: "" });
-                }
-              }}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              editable={!isSubmitting}
-            />
-            {errors.email ? (
-              <Text style={authStyles.errorText}>{errors.email}</Text>
-            ) : null}
-          </View>
-
-          <View style={authStyles.inputContainer}>
-            <Text style={authStyles.inputLabel}>Password</Text>
-            <View style={authStyles.passwordContainer}>
-              <TextInput
-                style={[
-                  authStyles.input,
-                  errors.password && authStyles.inputError,
-                ]}
-                placeholder="Create a password"
-                placeholderTextColor="#999999"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  if (errors.password) {
-                    setErrors({ ...errors, password: "" });
-                  }
-                }}
-                secureTextEntry={!showPassword}
-                editable={!isSubmitting}
-              />
-              <TouchableOpacity
-                style={authStyles.passwordToggle}
-                onPress={() => setShowPassword(!showPassword)}
-                disabled={isSubmitting}
-              >
-                <Text style={authStyles.passwordToggleText}>
-                  {showPassword ? "Hide" : "Show"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            {errors.password ? (
-              <Text style={authStyles.errorText}>{errors.password}</Text>
-            ) : null}
-          </View>
-
-          <View style={authStyles.inputContainer}>
-            <Text style={authStyles.inputLabel}>Confirm Password</Text>
-            <View style={authStyles.passwordContainer}>
-              <TextInput
-                style={[
-                  authStyles.input,
-                  errors.confirmPassword && authStyles.inputError,
-                ]}
-                placeholder="Re-enter your password"
-                placeholderTextColor="#999999"
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (errors.confirmPassword) {
-                    setErrors({ ...errors, confirmPassword: "" });
-                  }
-                }}
-                secureTextEntry={!showConfirmPassword}
-                editable={!isSubmitting}
-              />
-              <TouchableOpacity
-                style={authStyles.passwordToggle}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                disabled={isSubmitting}
-              >
-                <Text style={authStyles.passwordToggleText}>
-                  {showConfirmPassword ? "Hide" : "Show"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            {errors.confirmPassword ? (
-              <Text style={authStyles.errorText}>{errors.confirmPassword}</Text>
-            ) : null}
-          </View>
-
-          <TouchableOpacity
-            style={[
-              authStyles.primaryButton,
-              isSubmitting && authStyles.primaryButtonDisabled,
-            ]}
-            onPress={handleRegister}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={authStyles.primaryButtonText}>Create account</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        <View style={authStyles.linkContainer}>
-          <Text style={authStyles.linkText}>
-            Already have an account?{" "}
-            <Text
-              style={authStyles.linkTextBold}
-              onPress={() => !isSubmitting && navigation.navigate("Login")}
+              onPress={handleRegister}
+              disabled={isSubmitting}
+              activeOpacity={0.8}
             >
-              Login
+              {isSubmitting ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.registerText}>Create account</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Footer Text */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Already have an account?{" "}
+              <Text
+                style={styles.footerLink}
+                onPress={() => !isSubmitting && navigation.navigate("Login")}
+              >
+                Login
+              </Text>
             </Text>
-          </Text>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -271,13 +293,140 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 16,
-    alignSelf: "center",
+  keyboardView: {
+    flex: 1,
+    backgroundColor: "#f5f7fa",
   },
-  titleBlue: {
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 24,
+  },
+  headerSection: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 18,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
     color: "#2196F3",
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  errorBanner: {
+    backgroundColor: "#fee",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#fcc",
+  },
+  errorBannerText: {
+    color: "#c33",
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "500",
+  },
+  inputGroup: {
+    marginBottom: 18,
+  },
+  label: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: "#f8f9fb",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e2e5ea",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: "#333",
+  },
+  inputError: {
+    borderColor: "#ff4d4d",
+    borderWidth: 1.5,
+  },
+  errorText: {
+    color: "#ff4d4d",
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+  },
+  passwordWrapper: {
+    position: "relative",
+  },
+  passwordInput: {
+    paddingRight: 50,
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 14,
+    top: 12,
+    padding: 4,
+  },
+  registerButton: {
+    backgroundColor: "#2196F3",
+    borderRadius: 22,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+    shadowColor: "#2196F3",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  registerButtonDisabled: {
+    opacity: 0.6,
+  },
+  registerText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "600",
+    letterSpacing: 0.3,
+  },
+  footer: {
+    marginTop: 24,
+    alignItems: "center",
+  },
+  footerText: {
+    fontSize: 15,
+    color: "#666",
+  },
+  footerLink: {
+    color: "#2196F3",
+    fontWeight: "600",
   },
 });

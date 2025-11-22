@@ -168,16 +168,7 @@ export default function RootNavigator() {
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
-            options={{
-              title: "Create account",
-              headerStyle: {
-                backgroundColor: "#FFFFFF",
-              },
-              headerTintColor: "#5B3FFF",
-              headerTitleStyle: {
-                fontWeight: "600",
-              },
-            }}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       )}
