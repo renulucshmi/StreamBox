@@ -10,8 +10,10 @@ import DetailsScreen from "../screens/DetailsScreen";
 import FavouritesScreen from "../screens/FavouritesScreen";
 import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
+import NotificationsScreen from "../screens/NotificationsScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import SubscriptionScreen from "../screens/SubscriptionScreen";
 import TrendingScreen from "../screens/TrendingScreen";
 import { RootStackParamList } from "../types/navigation";
 
@@ -20,6 +22,7 @@ const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const TrendingStack = createNativeStackNavigator();
 const FavouritesStack = createNativeStackNavigator();
+const ProfileStack = createNativeStackNavigator();
 
 // Home Stack Navigator
 function HomeStackNavigator() {
@@ -72,6 +75,29 @@ function FavouritesStackNavigator() {
         options={{ headerShown: false }}
       />
     </FavouritesStack.Navigator>
+  );
+}
+
+// Profile Stack Navigator
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name="ProfileMain"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="Subscription"
+        component={SubscriptionScreen}
+        options={{ headerShown: false }}
+      />
+    </ProfileStack.Navigator>
   );
 }
 
@@ -130,7 +156,7 @@ function MainTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStackNavigator}
         options={{ tabBarLabel: "Profile" }}
       />
     </Tab.Navigator>

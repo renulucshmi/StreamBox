@@ -1,7 +1,7 @@
 /**
  * ProfileScreen Component (TypeScript)
- * Clean account/settings page with user info, account options, app settings, and logout
- * Features: User avatar, account management, dark mode toggle, logout
+ * Clean account/settings page with user info and settings
+ * Features: User avatar, notifications, subscription, dark mode toggle, logout
  */
 
 import { Feather } from "@expo/vector-icons";
@@ -12,21 +12,19 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ProfileRow from "../components/ProfileRow";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
-const ProfileScreen: React.FC = () => {
+const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user, logout } = useAuth();
   const { theme, themeMode, toggleTheme } = useTheme();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [showComingSoonDialog, setShowComingSoonDialog] = useState(false);
-  const [comingSoonTitle, setComingSoonTitle] = useState("");
 
   // Get user initial for avatar
   const getUserInitial = (): string => {
@@ -44,16 +42,14 @@ const ProfileScreen: React.FC = () => {
     await logout();
   };
 
-  // Edit profile placeholder
-  const handleEditProfile = (): void => {
-    setComingSoonTitle("Edit Profile");
-    setShowComingSoonDialog(true);
+  // Navigate to Notifications
+  const handleNotifications = (): void => {
+    navigation.navigate("Notifications");
   };
 
-  // Change password placeholder
-  const handleChangePassword = (): void => {
-    setComingSoonTitle("Change Password");
-    setShowComingSoonDialog(true);
+  // Navigate to Subscription
+  const handleSubscription = (): void => {
+    navigation.navigate("Subscription");
   };
 
   return (
@@ -103,76 +99,139 @@ const ProfileScreen: React.FC = () => {
           </Text>
         </View>
 
-        {/* Account Section */}
+        {/* Settings Section */}
         <View style={styles.section}>
           <Text
             style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}
           >
-            Account
+            Settings
           </Text>
           <View
             style={[
-              styles.rowsContainer,
+              styles.settingsList,
               {
                 backgroundColor: theme.colors.card,
                 borderColor: theme.colors.border,
               },
             ]}
           >
-            <ProfileRow
-              icon="edit-3"
-              label="Edit Profile"
-              onPress={handleEditProfile}
-              showArrow={true}
-            />
-            <ProfileRow
-              icon="lock"
-              label="Change Password"
-              onPress={handleChangePassword}
-              showArrow={true}
-            />
+            {/* Notifications */}
+            <TouchableOpacity
+              style={[
+                styles.settingRow,
+                { borderBottomColor: theme.colors.border },
+              ]}
+              onPress={handleNotifications}
+              activeOpacity={0.7}
+            >
+              <View style={styles.settingLeft}>
+                <Feather
+                  name="bell"
+                  size={22}
+                  color={theme.colors.text}
+                  style={styles.settingIcon}
+                />
+                <Text
+                  style={[styles.settingLabel, { color: theme.colors.text }]}
+                >
+                  Notifications
+                </Text>
+              </View>
+              <Feather
+                name="chevron-right"
+                size={20}
+                color={theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+
+            {/* Subscription */}
+            <TouchableOpacity
+              style={[
+                styles.settingRow,
+                { borderBottomColor: theme.colors.border },
+              ]}
+              onPress={handleSubscription}
+              activeOpacity={0.7}
+            >
+              <View style={styles.settingLeft}>
+                <Feather
+                  name="credit-card"
+                  size={22}
+                  color={theme.colors.text}
+                  style={styles.settingIcon}
+                />
+                <Text
+                  style={[styles.settingLabel, { color: theme.colors.text }]}
+                >
+                  Subscription
+                </Text>
+              </View>
+              <Feather
+                name="chevron-right"
+                size={20}
+                color={theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+
+            {/* Dark Mode */}
+            <View style={styles.settingRow}>
+              <View style={styles.settingLeft}>
+                <Feather
+                  name={themeMode === "dark" ? "moon" : "sun"}
+                  size={22}
+                  color={theme.colors.text}
+                  style={styles.settingIcon}
+                />
+                <Text
+                  style={[styles.settingLabel, { color: theme.colors.text }]}
+                >
+                  Dark Mode
+                </Text>
+              </View>
+              <Switch
+                value={themeMode === "dark"}
+                onValueChange={toggleTheme}
+                trackColor={{
+                  false: theme.colors.border,
+                  true: theme.colors.primary,
+                }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
           </View>
         </View>
 
-        {/* App Settings Section */}
+        {/* Logout Row */}
         <View style={styles.section}>
-          <Text
-            style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}
-          >
-            App Settings
-          </Text>
           <View
             style={[
-              styles.rowsContainer,
+              styles.settingsList,
               {
                 backgroundColor: theme.colors.card,
                 borderColor: theme.colors.border,
               },
             ]}
           >
-            <ProfileRow
-              icon={themeMode === "dark" ? "moon" : "sun"}
-              label="Dark Mode"
-              showSwitch={true}
-              switchValue={themeMode === "dark"}
-              onSwitchChange={toggleTheme}
-              showArrow={false}
-            />
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={handleLogout}
+              activeOpacity={0.7}
+            >
+              <View style={styles.settingLeft}>
+                <Feather
+                  name="log-out"
+                  size={22}
+                  color={theme.colors.error}
+                  style={styles.settingIcon}
+                />
+                <Text
+                  style={[styles.settingLabel, { color: theme.colors.error }]}
+                >
+                  Logout
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
-        </View>
-
-        {/* Logout Button */}
-        <View style={styles.logoutContainer}>
-          <TouchableOpacity
-            style={[styles.logoutButton, { borderColor: theme.colors.error }]}
-            onPress={handleLogout}
-            activeOpacity={0.7}
-          >
-            <Feather name="log-out" size={20} color={theme.colors.error} />
-            <Text style={[styles.logoutText, { color: theme.colors.error }]}>
-              Logout
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Footer Spacing */}
@@ -233,54 +292,6 @@ const ProfileScreen: React.FC = () => {
                   ]}
                 >
                   LOGOUT
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Pressable>
-      </Modal>
-
-      {/* Coming Soon Dialog */}
-      <Modal
-        visible={showComingSoonDialog}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowComingSoonDialog(false)}
-      >
-        <Pressable
-          style={styles.dialogOverlay}
-          onPress={() => setShowComingSoonDialog(false)}
-        >
-          <View
-            style={[
-              styles.dialogContent,
-              { backgroundColor: theme.colors.card },
-            ]}
-            onStartShouldSetResponder={() => true}
-          >
-            <Text style={[styles.dialogTitle, { color: theme.colors.text }]}>
-              {comingSoonTitle}
-            </Text>
-            <Text
-              style={[
-                styles.dialogMessage,
-                { color: theme.colors.textSecondary },
-              ]}
-            >
-              This feature is coming soon!
-            </Text>
-            <View style={styles.dialogButtons}>
-              <TouchableOpacity
-                style={styles.dialogButton}
-                onPress={() => setShowComingSoonDialog(false)}
-              >
-                <Text
-                  style={[
-                    styles.dialogButtonText,
-                    { color: theme.colors.primary },
-                  ]}
-                >
-                  OK
                 </Text>
               </TouchableOpacity>
             </View>
@@ -356,27 +367,30 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginLeft: 4,
   },
-  rowsContainer: {
+  settingsList: {
     borderRadius: 12,
     overflow: "hidden",
     borderWidth: 1,
   },
-  logoutContainer: {
-    paddingHorizontal: 20,
-    marginTop: 8,
-  },
-  logoutButton: {
+  settingRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 2,
-    gap: 10,
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    minHeight: 56,
+    borderBottomWidth: 0.5,
   },
-  logoutText: {
-    fontSize: 17,
-    fontWeight: "600",
+  settingLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  settingIcon: {
+    marginRight: 16,
+  },
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: "500",
   },
   footer: {
     height: 40,
