@@ -54,40 +54,6 @@ src/
 ✅ **Clean Imports** - Centralized exports with barrel (index) files  
 ✅ **Modular Services** - API calls abstracted into service layer
 
-## 📸 Screenshots
-
-### Light Mode
-
-| Login Screen                          | Home Screen                         | Movie Details                             |
-| ------------------------------------- | ----------------------------------- | ----------------------------------------- |
-| ![Login](screenshots/login-light.png) | ![Home](screenshots/home-light.png) | ![Details](screenshots/details-light.png) |
-
-### Dark Mode
-
-| Favourites                                     | Trending                                   | Profile                                  |
-| ---------------------------------------------- | ------------------------------------------ | ---------------------------------------- |
-| ![Favourites](screenshots/favourites-dark.png) | ![Trending](screenshots/trending-dark.png) | ![Profile](screenshots/profile-dark.png) |
-
-### Features Showcase
-
-| Search & Filter                     | Notifications                                   | Subscription Plans                            |
-| ----------------------------------- | ----------------------------------------------- | --------------------------------------------- |
-| ![Filters](screenshots/filters.png) | ![Notifications](screenshots/notifications.png) | ![Subscription](screenshots/subscription.png) |
-
-## 🎥 Demo Video
-
-Watch the full app demonstration: [StreamBox Demo Video](YOUR_VIDEO_LINK_HERE)
-
-**Video Highlights:**
-
-- User registration and login flow
-- Browse and search movies
-- Apply language and genre filters
-- View movie details
-- Add/remove favourites
-- Toggle dark mode
-- Navigate through all screens
-
 ## 🚀 Get Started
 
 ### Prerequisites

@@ -93,6 +93,8 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
     try {
       await register({ username, email, password });
+      // Navigate to login page after successful registration
+      navigation.navigate("Login");
     } catch (error) {
       setGeneralError(
         (error as Error).message || "Registration failed. Please try again."
