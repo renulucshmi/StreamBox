@@ -55,7 +55,7 @@ export default function FavouritesScreen({
     language: fav.language || "Unknown",
     genres: fav.genres || [],
     rating: fav.rating || 0,
-    posterUrl: fav.poster || "",
+    posterUrl: fav.posterUrl || "",
     isTrending: false,
   }));
 
