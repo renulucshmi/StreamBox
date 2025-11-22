@@ -25,14 +25,28 @@ interface UserWithToken extends User {
 const API_BASE_URL = "https://dummyjson.com";
 
 /**
- * Login user with email and password using DummyJSON API
+ * Login user with email and password
+ * Supports both DummyJSON API and local hardcoded users
  * Test credentials: username: "emilys", password: "emilyspass"
+ * Custom user: "renulucshmi@gmail.com", password: "Asdw1234"
  */
 export const loginUser = async ({
   email,
   password,
 }: LoginCredentials): Promise<UserWithToken> => {
   try {
+    // Check for hardcoded local user first
+    if (email === "renulucshmi@gmail.com" && password === "Asdw1234") {
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      return {
+        username: "renulucshmi",
+        email: "renulucshmi@gmail.com",
+        token: "local-token-renulucshmi-" + Date.now(),
+        id: "999",
+      };
+    }
+
     // DummyJSON uses username instead of email
     // Extract username from email or use email directly
     const username = email.includes("@") ? email.split("@")[0] : email;

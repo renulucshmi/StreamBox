@@ -34,7 +34,7 @@ const watchLaterSlice = createSlice({
     /**
      * Remove a movie from watch later
      */
-    removeFromWatchLater: (state, action: PayloadAction<number>) => {
+    removeFromWatchLater: (state, action: PayloadAction<string>) => {
       const movieId = action.payload;
       state.watchLater = state.watchLater.filter((item) => item.id !== movieId);
     },
@@ -73,7 +73,7 @@ export const selectWatchLaterCount = (state: {
 }): number => state.watchLater.watchLater.length;
 
 export const selectIsInWatchLater =
-  (movieId: number) =>
+  (movieId: string) =>
   (state: { watchLater: WatchLaterState }): boolean =>
     state.watchLater.watchLater.some((item: Movie) => item.id === movieId);
 
