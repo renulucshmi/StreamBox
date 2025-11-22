@@ -45,7 +45,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: theme.colors.card,
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.border,
           shadowColor: theme.colors.shadowColor,
         },
         style,
@@ -60,7 +61,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
       <TextInput
         style={[styles.input, { color: theme.colors.text }, inputStyle]}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.searchPlaceholder}
+        placeholderTextColor={theme.colors.textSecondary}
+        cursorColor={theme.colors.primary}
+        selectionColor={theme.colors.primary}
         value={value}
         onChangeText={onChangeText}
         autoCapitalize="none"
@@ -77,6 +80,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 12,
+    borderWidth: 1,
     height: 48,
     paddingHorizontal: 16,
     shadowOffset: { width: 0, height: 1 },
@@ -90,6 +94,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    paddingVertical: 0,
+    includeFontPadding: false,
   },
 });
 
