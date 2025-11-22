@@ -1,12 +1,10 @@
 /**
  * ProfileScreen Component (TypeScript)
- * Displays user profile information, settings, and navigation options
- * Features: User info, dark mode toggle, navigation to favourites/watch later, logout
+ * Clean account/settings page with user info, account options, app settings, and logout
+ * Features: User avatar, account management, dark mode toggle, logout
  */
 
 import { Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import {
   Modal,
@@ -22,22 +20,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileRow from "../components/ProfileRow";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
-import type { RootStackParamList } from "../types/navigation";
-
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Profile"
->;
 
 const ProfileScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { theme, themeMode, toggleTheme } = useTheme();
-  const navigation = useNavigation<ProfileScreenNavigationProp>();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showComingSoonDialog, setShowComingSoonDialog] = useState(false);
   const [comingSoonTitle, setComingSoonTitle] = useState("");
 
-  // Get user initials for avatar
+  // Get user initial for avatar
   const getUserInitial = (): string => {
     if (!user?.username) return "G";
     return user.username.charAt(0).toUpperCase();
@@ -53,20 +44,15 @@ const ProfileScreen: React.FC = () => {
     await logout();
   };
 
-  // Navigate to Favourites screen
-  const navigateToFavourites = (): void => {
-    navigation.navigate("Favourites");
-  };
-
-  // Navigate to Watch Later screen (placeholder for now)
-  const navigateToWatchLater = (): void => {
-    setComingSoonTitle("Watch Later");
-    setShowComingSoonDialog(true);
-  };
-
   // Edit profile placeholder
   const handleEditProfile = (): void => {
     setComingSoonTitle("Edit Profile");
+    setShowComingSoonDialog(true);
+  };
+
+  // Change password placeholder
+  const handleChangePassword = (): void => {
+    setComingSoonTitle("Change Password");
     setShowComingSoonDialog(true);
   };
 
@@ -117,12 +103,12 @@ const ProfileScreen: React.FC = () => {
           </Text>
         </View>
 
-        {/* Profile Options Section */}
+        {/* Account Section */}
         <View style={styles.section}>
           <Text
             style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}
           >
-            Profile Options
+            Account
           </Text>
           <View
             style={[
@@ -140,16 +126,9 @@ const ProfileScreen: React.FC = () => {
               showArrow={true}
             />
             <ProfileRow
-              icon="heart"
-              label="My Favourites"
-              onPress={navigateToFavourites}
-              showArrow={true}
-              iconColor={theme.colors.error}
-            />
-            <ProfileRow
-              icon="bookmark"
-              label="Watch Later"
-              onPress={navigateToWatchLater}
+              icon="lock"
+              label="Change Password"
+              onPress={handleChangePassword}
               showArrow={true}
             />
           </View>
