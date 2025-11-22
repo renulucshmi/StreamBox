@@ -4,14 +4,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import DetailsScreen from "../screens/DetailsScreen";
 import FavouritesScreen from "../screens/FavouritesScreen";
 import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
+import NotificationsScreen from "../screens/NotificationsScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import SubscriptionScreen from "../screens/SubscriptionScreen";
 import TrendingScreen from "../screens/TrendingScreen";
 import { RootStackParamList } from "../types/navigation";
 
@@ -20,6 +23,7 @@ const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const TrendingStack = createNativeStackNavigator();
 const FavouritesStack = createNativeStackNavigator();
+const ProfileStack = createNativeStackNavigator();
 
 // Home Stack Navigator
 function HomeStackNavigator() {
@@ -75,8 +79,32 @@ function FavouritesStackNavigator() {
   );
 }
 
+// Profile Stack Navigator
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name="ProfileMain"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="Subscription"
+        component={SubscriptionScreen}
+        options={{ headerShown: false }}
+      />
+    </ProfileStack.Navigator>
+  );
+}
+
 function MainTabs() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -88,8 +116,8 @@ function MainTabs() {
           backgroundColor: theme.colors.tabBar,
           borderTopWidth: 1,
           borderTopColor: theme.colors.tabBarBorder,
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom + 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
@@ -130,7 +158,7 @@ function MainTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStackNavigator}
         options={{ tabBarLabel: "Profile" }}
       />
     </Tab.Navigator>

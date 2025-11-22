@@ -34,9 +34,11 @@ const favouritesSlice = createSlice({
     /**
      * Remove a movie from favourites
      */
-    removeFromFavourites: (state, action: PayloadAction<number>) => {
-      const movieId = action.payload;
-      state.favourites = state.favourites.filter((item) => item.id !== movieId);
+    removeFromFavourites: (state, action: PayloadAction<string | number>) => {
+      const movieId = String(action.payload);
+      state.favourites = state.favourites.filter(
+        (item) => String(item.id) !== movieId
+      );
     },
 
     /**
@@ -73,9 +75,11 @@ export const selectFavouritesCount = (state: {
 }): number => state.favourites.favourites.length;
 
 export const selectIsFavourite =
-  (movieId: number) =>
+  (movieId: string | number) =>
   (state: { favourites: FavouritesState }): boolean =>
-    state.favourites.favourites.some((item: Movie) => item.id === movieId);
+    state.favourites.favourites.some(
+      (item: Movie) => String(item.id) === String(movieId)
+    );
 
 // Export reducer
 export default favouritesSlice.reducer;

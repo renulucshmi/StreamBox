@@ -1,11 +1,10 @@
 /**
- * MovieCard - Premium Design with Gradients & Animations
- * Features: LinearGradient overlay, filled star ratings, scale animation, improved badges
+ * MovieCard - Unified movie card design for all screens
+ * Features: TRENDING tag only, language/genre pills, rating badge, heart icon
  */
 
-import { MaterialIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useRef } from "react";
+import { FontAwesome } from "@expo/vector-icons";
+import { useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -16,51 +15,36 @@ import {
   View,
 } from "react-native";
 import { useTheme } from "../context/ThemeContext";
+import { Movie } from "../types/movie";
 
 const { width: screenWidth } = Dimensions.get("window");
-
-// Calculate card width for 2-column grid
-const CARD_WIDTH = (screenWidth - 48) / 2;
-const POSTER_ASPECT_RATIO = 3 / 2;
+const CARD_WIDTH = (screenWidth - 48) / 2; // 2 columns with padding
 
 interface MovieCardProps {
-  movie: any;
+  movie: Movie;
+  isFavourite: boolean;
   onPress: () => void;
-  isFavourite?: boolean;
-  onFavouritePress?: (movie: any) => void;
-  index?: number;
+  onToggleFavourite: () => void;
+  showTrendingTag?: boolean; // Only show on Trending screen
 }
 
 const MovieCard: React.FC<MovieCardProps> = ({
   movie,
-  onPress,
   isFavourite,
-  onFavouritePress,
-  index = 0,
+  onPress,
+  onToggleFavourite,
+  showTrendingTag = false,
 }) => {
   const { theme } = useTheme();
-
-  // Animations
-  const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const heartScaleAnim = useRef(new Animated.Value(1)).current;
+  const [imageError, setImageError] = useState(false);
 
-  // Fade-in animation on mount
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 400,
-      delay: index * 50,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  // Scale animation on press
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
       toValue: 0.96,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4,
     }).start();
   };
 
@@ -69,52 +53,27 @@ const MovieCard: React.FC<MovieCardProps> = ({
       toValue: 1,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4,
     }).start();
   };
 
-  // Get status badge info
-  const getStatusBadge = () => {
-    const status = movie.status;
-    if (status === "Popular") return { text: "Popular", color: "#FF6B6B" };
-    if (status === "Trending") return { text: "Trending", color: "#4DB5FF" };
-    if (status === "Top Rated") return { text: "Top Rated", color: "#6BCB77" };
-    if (status === "Upcoming") return { text: "Upcoming", color: "#FFD93D" };
-    return null;
-  };
-
-  const badge = getStatusBadge();
-
-  // Render filled stars based on rating
-  const renderStars = () => {
-    const rating = parseFloat(movie.rating) || 0;
-    const fullStars = Math.floor(rating / 2); // Convert 10-point to 5-point scale
-    const stars = [];
-
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <MaterialIcons
-          key={i}
-          name={i < fullStars ? "star" : "star-border"}
-          size={14}
-          color="#FFD700"
-          style={styles.starIcon}
-        />
-      );
-    }
-    return stars;
+  const handleHeartPress = () => {
+    Animated.sequence([
+      Animated.spring(heartScaleAnim, {
+        toValue: 1.3,
+        useNativeDriver: true,
+        speed: 50,
+      }),
+      Animated.spring(heartScaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 50,
+      }),
+    ]).start();
+    onToggleFavourite();
   };
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }],
-        },
-      ]}
-    >
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
         onPress={onPress}
         onPressIn={handlePressIn}
@@ -123,66 +82,100 @@ const MovieCard: React.FC<MovieCardProps> = ({
           styles.card,
           {
             backgroundColor: theme.colors.card,
-            shadowColor: theme.colors.shadowColor,
+            shadowColor: theme.colors.text,
           },
         ]}
       >
-        {/* Poster Image */}
+        {/* Poster Container */}
         <View style={styles.posterContainer}>
-          <Image
-            source={{ uri: movie.poster }}
-            style={styles.poster}
-            resizeMode="cover"
-          />
-
-          {/* Gradient Overlay */}
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.8)"]}
-            style={styles.gradient}
-          />
-
-          {/* Status Badge */}
-          {badge && (
-            <View
-              style={[styles.statusBadge, { backgroundColor: badge.color }]}
-            >
-              <Text style={styles.statusText}>{badge.text}</Text>
-            </View>
-          )}
-
-          {/* Language Badge */}
-          {movie.language && (
+          {/* Poster Image with Error Handling */}
+          {!imageError ? (
+            <Image
+              source={{ uri: movie.posterUrl }}
+              style={styles.poster}
+              onError={() => setImageError(true)}
+            />
+          ) : (
             <View
               style={[
-                styles.languageBadge,
-                { backgroundColor: theme.colors.overlay },
+                styles.poster,
+                styles.placeholderContainer,
+                { backgroundColor: theme.colors.background },
               ]}
             >
-              <Text style={styles.languageText}>{movie.language}</Text>
+              <FontAwesome
+                name="film"
+                size={48}
+                color={theme.colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.placeholderText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                No Image
+              </Text>
             </View>
           )}
 
-          {/* Favourite Button */}
-          {onFavouritePress && (
-            <Pressable
-              style={styles.favouriteButton}
-              onPress={(e) => {
-                e.stopPropagation();
-                onFavouritePress(movie);
-              }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <MaterialIcons
-                name={isFavourite ? "favorite" : "favorite-border"}
-                size={22}
-                color={isFavourite ? "#FF6B6B" : "#FFFFFF"}
+          {/* Top Pills and Tags */}
+          <View style={styles.topRow}>
+            <View style={styles.leftPills}>
+              {/* Language Pill */}
+              <View
+                style={[
+                  styles.pill,
+                  { backgroundColor: theme.colors.background + "DD" },
+                ]}
+              >
+                <Text style={[styles.pillText, { color: theme.colors.text }]}>
+                  {movie.language}
+                </Text>
+              </View>
+
+              {/* First Genre Pill */}
+              {movie.genres.length > 0 && (
+                <View
+                  style={[
+                    styles.pill,
+                    { backgroundColor: theme.colors.background + "DD" },
+                  ]}
+                >
+                  <Text style={[styles.pillText, { color: theme.colors.text }]}>
+                    {movie.genres[0]}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* TRENDING Tag - Only if enabled and movie is trending */}
+            {showTrendingTag && movie.isTrending && (
+              <View style={styles.trendingTag}>
+                <Text style={styles.trendingText}>TRENDING</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Heart Icon */}
+          <Animated.View
+            style={[
+              styles.heartContainer,
+              { transform: [{ scale: heartScaleAnim }] },
+            ]}
+          >
+            <Pressable onPress={handleHeartPress} hitSlop={8}>
+              <FontAwesome
+                name={isFavourite ? "heart" : "heart-o"}
+                size={20}
+                color={isFavourite ? "#ff5252" : "#ffffff"}
               />
             </Pressable>
-          )}
+          </Animated.View>
         </View>
 
-        {/* Content Section */}
-        <View style={styles.content}>
+        {/* Bottom Info Section */}
+        <View style={styles.infoSection}>
           {/* Title */}
           <Text
             style={[styles.title, { color: theme.colors.text }]}
@@ -193,18 +186,15 @@ const MovieCard: React.FC<MovieCardProps> = ({
 
           {/* Rating Row */}
           <View style={styles.ratingRow}>
-            {/* Star Rating */}
-            <View style={styles.ratingContainer}>
-              <View style={styles.starsRow}>{renderStars()}</View>
-              <Text
-                style={[
-                  styles.ratingText,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                {movie.rating || "N/A"}
-              </Text>
-            </View>
+            <FontAwesome name="star" size={14} color="#f3a000" />
+            <Text style={[styles.ratingText, { color: theme.colors.text }]}>
+              {movie.rating.toFixed(1)}
+            </Text>
+            <Text
+              style={[styles.genreText, { color: theme.colors.textSecondary }]}
+            >
+              {movie.genres[0] || "Movie"}
+            </Text>
           </View>
         </View>
       </Pressable>
@@ -213,112 +203,104 @@ const MovieCard: React.FC<MovieCardProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: CARD_WIDTH,
-  },
   card: {
+    width: CARD_WIDTH,
     borderRadius: 16,
     overflow: "hidden",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
+    marginBottom: 16,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 3,
   },
   posterContainer: {
     width: "100%",
-    height: CARD_WIDTH * POSTER_ASPECT_RATIO,
     position: "relative",
   },
   poster: {
     width: "100%",
-    height: "100%",
-    backgroundColor: "#E5E5E5",
+    height: CARD_WIDTH * 1.5, // 3:2 aspect ratio
+    resizeMode: "cover",
   },
-  gradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "50%",
-  },
-  statusBadge: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  statusText: {
-    color: "#FFFFFF",
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  languageBadge: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  languageText: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#FFFFFF",
-  },
-  favouriteButton: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(0,0,0,0.4)",
+  placeholderContainer: {
     justifyContent: "center",
     alignItems: "center",
   },
-  content: {
+  placeholderText: {
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 8,
+  },
+  topRow: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    right: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  leftPills: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    flex: 1,
+  },
+  pill: {
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  pillText: {
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  trendingTag: {
+    backgroundColor: "#ff5252",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  trendingText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 0.3,
+  },
+  heartContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  infoSection: {
     padding: 12,
   },
   title: {
     fontSize: 15,
     fontWeight: "700",
-    marginBottom: 8,
+    marginBottom: 6,
+    letterSpacing: 0.2,
     lineHeight: 20,
   },
   ratingRow: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    flex: 1,
-  },
-  starsRow: {
-    flexDirection: "row",
-  },
-  starIcon: {
-    marginRight: -2,
+    gap: 4,
   },
   ratingText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "600",
-    marginLeft: 2,
+  },
+  genreText: {
+    fontSize: 13,
+    fontWeight: "500",
+    marginLeft: 4,
   },
 });
 

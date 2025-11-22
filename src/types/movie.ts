@@ -1,8 +1,20 @@
 /**
  * Movie Type Definitions
+ * Unified type used across all screens
  */
 
-export interface Movie {
+export type Movie = {
+  id: string;
+  title: string;
+  language: string;
+  genres: string[];
+  rating: number;
+  posterUrl: string;
+  isTrending?: boolean;
+};
+
+// API Response Types (kept for compatibility)
+export interface MovieAPI {
   id: number;
   title: string;
   poster_path: string | null;
@@ -19,7 +31,13 @@ export interface Movie {
   video: boolean;
 }
 
-export interface MovieDetails extends Movie {
+export interface MovieDetails {
+  id: string;
+  title: string;
+  language: string;
+  rating: number;
+  posterUrl: string;
+  isTrending?: boolean;
   budget: number;
   homepage: string;
   imdb_id: string;
