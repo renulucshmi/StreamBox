@@ -58,8 +58,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }): Promise<User> => {
     try {
       const userData = await registerUser(data);
-      setUser(userData);
-      await saveUser(userData);
+      // Don't auto-login after registration
+      // User should be redirected to login page
       return userData;
     } catch (error) {
       throw error;

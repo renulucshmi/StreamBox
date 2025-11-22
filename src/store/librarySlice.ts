@@ -22,7 +22,7 @@ const librarySlice = createSlice({
         state.favourites.push(movie);
       }
     },
-    removeFromFavourites: (state, action: PayloadAction<number>) => {
+    removeFromFavourites: (state, action: PayloadAction<string>) => {
       const movieId = action.payload;
       state.favourites = state.favourites.filter((item) => item.id !== movieId);
     },
@@ -33,7 +33,7 @@ const librarySlice = createSlice({
         state.watchLater.push(movie);
       }
     },
-    removeFromWatchLater: (state, action: PayloadAction<number>) => {
+    removeFromWatchLater: (state, action: PayloadAction<string>) => {
       const movieId = action.payload;
       state.watchLater = state.watchLater.filter((item) => item.id !== movieId);
     },

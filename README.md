@@ -2,9 +2,6 @@
 
 A modern movie streaming app built with **React Native (Expo)** and **TypeScript**, following **clean architecture** and **best coding practices**.
 
-> **Assignment 2 - IN3210 Mobile Applications Development**  
-> A comprehensive movie browsing application demonstrating advanced React Native concepts, state management, and professional UI/UX design.
-
 ## ✨ Features
 
 ### Core Functionality
@@ -54,40 +51,6 @@ src/
 ✅ **Clean Imports** - Centralized exports with barrel (index) files  
 ✅ **Modular Services** - API calls abstracted into service layer
 
-## 📸 Screenshots
-
-### Light Mode
-
-| Login Screen                          | Home Screen                         | Movie Details                             |
-| ------------------------------------- | ----------------------------------- | ----------------------------------------- |
-| ![Login](screenshots/login-light.png) | ![Home](screenshots/home-light.png) | ![Details](screenshots/details-light.png) |
-
-### Dark Mode
-
-| Favourites                                     | Trending                                   | Profile                                  |
-| ---------------------------------------------- | ------------------------------------------ | ---------------------------------------- |
-| ![Favourites](screenshots/favourites-dark.png) | ![Trending](screenshots/trending-dark.png) | ![Profile](screenshots/profile-dark.png) |
-
-### Features Showcase
-
-| Search & Filter                     | Notifications                                   | Subscription Plans                            |
-| ----------------------------------- | ----------------------------------------------- | --------------------------------------------- |
-| ![Filters](screenshots/filters.png) | ![Notifications](screenshots/notifications.png) | ![Subscription](screenshots/subscription.png) |
-
-## 🎥 Demo Video
-
-Watch the full app demonstration: [StreamBox Demo Video](YOUR_VIDEO_LINK_HERE)
-
-**Video Highlights:**
-
-- User registration and login flow
-- Browse and search movies
-- Apply language and genre filters
-- View movie details
-- Add/remove favourites
-- Toggle dark mode
-- Navigate through all screens
-
 ## 🚀 Get Started
 
 ### Prerequisites
@@ -123,15 +86,6 @@ Watch the full app demonstration: [StreamBox Demo Video](YOUR_VIDEO_LINK_HERE)
    - Scan the QR code with Expo Go (Android) or Camera (iOS)
    - Press `a` for Android emulator
    - Press `i` for iOS simulator
-
-## 📖 Documentation
-
-Comprehensive documentation is available in the following files:
-
-- **[REFACTORING_GUIDE.md](./REFACTORING_GUIDE.md)** - Complete refactoring documentation with examples
-- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick reference for developers
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Visual architecture diagrams and data flow
-- **[SUMMARY.md](./SUMMARY.md)** - Summary of improvements and achievements
 
 ## 📱 Features Deep Dive
 
@@ -667,93 +621,6 @@ npm run reset-project
    - Add movies to favourites (heart icon)
    - Switch to dark mode (moon/sun icon)
 
-## 🎓 Assignment Requirements Checklist
-
-This project fulfills **IN3210 Mobile Applications Development - Assignment 2** requirements:
-
-### ✅ Authentication & Validation (15 marks)
-
-- [x] Complete registration screen with 4 fields
-- [x] Login screen with email/password
-- [x] Form validation using React Hooks
-- [x] Email regex validation
-- [x] Password strength validation (min 8, uppercase, lowercase, number)
-- [x] Confirm password matching
-- [x] Auto-navigation to Home on successful login
-- [x] User display in Profile screen
-- [x] AsyncStorage for user persistence
-- [x] Mock API implementation
-- [x] User-friendly UI with error handling
-
-### ✅ Navigation (10 marks)
-
-- [x] React Navigation implementation
-- [x] Stack navigation for screen hierarchies
-- [x] Bottom Tabs navigation (4 tabs)
-- [x] Conditional navigation (Auth vs Main App)
-- [x] Clean modular structure
-- [x] Safe area handling
-
-### ✅ Home Screen - Dynamic List (15 marks)
-
-- [x] Movies fetched from service layer
-- [x] Entertainment domain (Movies/TV Shows)
-- [x] Card design with image, title, rating
-- [x] Status display (Popular, Trending)
-- [x] Loading states
-- [x] Clean, responsive UI
-
-### ✅ Item Interaction & State (15 marks)
-
-- [x] Navigate to Details on tap
-- [x] Redux Toolkit state management
-- [x] Details screen with full movie info
-- [x] Favourite toggle updates Redux
-- [x] Redux Persist for data persistence
-
-### ✅ Favourites Feature (15 marks)
-
-- [x] Add/remove favourites functionality
-- [x] Favourites screen displays saved movies
-- [x] AsyncStorage persistence
-- [x] **Feather icons used throughout**
-- [x] Filter favourites by language/genre
-
-### ✅ UI/UX Design (15 marks)
-
-- [x] Consistent theme across screens
-- [x] Professional spacing, typography, shadows
-- [x] Responsive design for all screen sizes
-- [x] Clean, not overcrowded layouts
-- [x] Modern iOS-style floating cards
-- [x] Smooth animations and transitions
-
-### ✅ Code Quality (20 marks)
-
-- [x] Modular folder structure
-- [x] Reusable components (15+)
-- [x] Clean separation of concerns
-- [x] TypeScript for type safety
-- [x] Pure utility functions
-- [x] Error handling and loading states
-- [x] Consistent naming conventions
-- [x] Comprehensive documentation
-
-### ✅ Bonus - Dark Mode (5 marks)
-
-- [x] Global theme switching
-- [x] Colors adapt correctly
-- [x] Theme persistence with AsyncStorage
-- [x] Toggle button on all screens
-
-### 📋 Deliverables
-
-- [x] Public GitHub repository
-- [ ] Screenshots (Login, Home, Details, Favourites, Profile)
-- [ ] 2-minute demo video
-- [x] Working build
-- [x] Comprehensive README
-
 ## 📖 Learn More
 
 ### Official Documentation
@@ -868,8 +735,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 👨‍💻 Author & Contact
 
 **Renul Lucshmi**  
-🎓 Mobile Applications Development - IN3210  
-🏫 University Assignment Project  
 📧 [Contact via GitHub](https://github.com/renulucshmi)
 
 Built with ❤️ using **React Native**, **TypeScript**, and **Clean Architecture** principles.
@@ -925,5 +790,4 @@ Built with ❤️ using **React Native**, **TypeScript**, and **Clean Architectu
 ---
 
 _Last Updated: November 22, 2025_  
-_Version: 1.0.0_  
-_Status: ✅ Assignment Ready_
+_Version: 1.0.0_
