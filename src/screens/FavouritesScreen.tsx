@@ -57,7 +57,7 @@ export default function FavouritesScreen({
       case "Popular":
         return "#FF6B6B";
       case "Trending":
-        return "#4ECDC4";
+        return "#4DB5FF";
       case "Upcoming":
         return "#FFD93D";
       case "Top Rated":

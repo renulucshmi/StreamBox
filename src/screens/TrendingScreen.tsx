@@ -1,5 +1,3 @@
-import { Feather } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
@@ -7,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import MovieCard from "../components/MovieCard";
 import SectionHeader from "../components/SectionHeader";
+import ThemedPicker from "../components/ThemedPicker";
 import { useTheme } from "../context/ThemeContext";
 import {
   addToFavourites,
@@ -197,36 +196,20 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
       </View>
 
       {/* Language Filter Dropdown */}
-      <View
-        style={[
-          styles.filterContainer,
-          {
-            backgroundColor: theme.colors.card,
-            shadowColor: theme.colors.shadowColor,
-          },
+      <ThemedPicker
+        value={filter}
+        onValueChange={(itemValue: string) => setFilter(itemValue)}
+        items={[
+          { label: "All Languages", value: "all" },
+          { label: "English", value: "english" },
+          { label: "Korean", value: "korean" },
+          { label: "Spanish", value: "spanish" },
+          { label: "German", value: "german" },
         ]}
-      >
-        <Feather
-          name="globe"
-          size={18}
-          color={theme.colors.textSecondary}
-          style={styles.filterIcon}
-        />
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={filter}
-            onValueChange={(itemValue) => setFilter(itemValue)}
-            style={[styles.picker, { color: theme.colors.text }]}
-            dropdownIconColor={theme.colors.primary}
-          >
-            <Picker.Item label="All Languages" value="all" />
-            <Picker.Item label="English" value="english" />
-            <Picker.Item label="Korean" value="korean" />
-            <Picker.Item label="Spanish" value="spanish" />
-            <Picker.Item label="German" value="german" />
-          </Picker>
-        </View>
-      </View>
+        iconName="globe"
+        iconSize={18}
+        style={styles.filterContainer}
+      />
 
       {/* Movie Grid */}
       <FlatList
@@ -280,30 +263,9 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   filterContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     marginHorizontal: 16,
     marginTop: 12,
     marginBottom: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    borderRadius: 12,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-    minHeight: 50,
-  },
-  filterIcon: {
-    marginRight: 8,
-  },
-  pickerWrapper: {
-    flex: 1,
-    marginLeft: -8,
-  },
-  picker: {
-    height: 50,
-    fontSize: 15,
   },
   gridContainer: {
     paddingHorizontal: 12,

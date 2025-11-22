@@ -64,7 +64,7 @@ export const authStyles = StyleSheet.create({
     top: 14,
   },
   passwordToggleText: {
-    color: "#5B3FFF",
+    color: "#2196F3",
     fontSize: 14,
     fontWeight: "500",
   },
@@ -85,12 +85,12 @@ export const authStyles = StyleSheet.create({
     textAlign: "center",
   },
   primaryButton: {
-    backgroundColor: "#5B3FFF",
+    backgroundColor: "#2196F3",
     borderRadius: 24,
     padding: 16,
     alignItems: "center",
     marginTop: 8,
-    shadowColor: "#5B3FFF",
+    shadowColor: "#2196F3",
     shadowOffset: {
       width: 0,
       height: 4,
@@ -100,7 +100,7 @@ export const authStyles = StyleSheet.create({
     elevation: 4,
   },
   primaryButtonDisabled: {
-    backgroundColor: "#B8B0FF",
+    backgroundColor: "#8BE2FF",
   },
   primaryButtonText: {
     color: "#FFFFFF",
@@ -116,7 +116,7 @@ export const authStyles = StyleSheet.create({
     color: "#666666",
   },
   linkTextBold: {
-    color: "#5B3FFF",
+    color: "#2196F3",
     fontWeight: "600",
   },
 });

@@ -29,7 +29,7 @@ interface CardDimensions {
 export const getStatusColor = (status: string): string => {
   const statusColors: Record<string, string> = {
     Popular: "#FF6B6B",
-    Trending: "#4ECDC4",
+    Trending: "#4DB5FF",
     Upcoming: "#FFD93D",
     "Top Rated": "#6BCB77",
   };
