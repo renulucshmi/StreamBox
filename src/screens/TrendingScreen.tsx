@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../components/EmptyState";
 import FilterPanel from "../components/filters/FilterPanel";
+import IconButton from "../components/IconButton";
 import MovieCard from "../components/MovieCard";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -157,7 +158,7 @@ const TRENDING_DATA: Movie[] = [
 export default function TrendingScreen({ navigation }: TrendingScreenProps) {
   const dispatch = useDispatch<AppDispatch>();
   const favourites = useSelector(selectFavourites);
-  const { theme } = useTheme();
+  const { theme, themeMode, toggleTheme } = useTheme();
 
   // Local state
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -223,15 +224,22 @@ export default function TrendingScreen({ navigation }: TrendingScreenProps) {
 
       {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            Trending Now
-          </Text>
-          <Text
-            style={[styles.subtitle, { color: theme.colors.textSecondary }]}
-          >
-            Most popular movies this week
-          </Text>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              Trending Now
+            </Text>
+            <Text
+              style={[styles.subtitle, { color: theme.colors.textSecondary }]}
+            >
+              Most popular movies this week
+            </Text>
+          </View>
+          <IconButton
+            iconName={themeMode === "dark" ? "sun" : "moon"}
+            size={22}
+            onPress={toggleTheme}
+          />
         </View>
       </View>
 
@@ -292,6 +300,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 12,
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   title: {
     fontSize: 28,
