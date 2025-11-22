@@ -1,10 +1,10 @@
 /**
- * LanguageChip - Multi-select chip component
- * Features: Toggle selection, theme-aware, smooth press feedback
+ * LanguageChip - Multi-select chip component with scale animation
+ * Features: Toggle selection, theme-aware, smooth scale feedback
  */
 
-import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { useRef } from "react";
+import { Animated, Pressable, StyleSheet, Text } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 
 interface LanguageChipProps {
@@ -18,52 +18,68 @@ const LanguageChip: React.FC<LanguageChipProps> = ({
   selected,
   onPress,
 }) => {
-  const { theme, themeMode } = useTheme();
+  const { themeMode } = useTheme();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 50,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+    }).start();
+  };
 
   // Colors based on selection and theme
   const chipBackground = selected
     ? "#2b8eff"
     : themeMode === "dark"
-    ? "#2A2A30"
-    : "#F0F0F0";
+    ? "#1c1d22"
+    : "#e9ecf1";
 
-  const textColor = selected
-    ? "#FFFFFF"
-    : themeMode === "dark"
-    ? theme.colors.textSecondary
-    : "#666666";
+  const textColor = selected ? "#FFFFFF" : "#444444";
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.chip,
-        {
-          backgroundColor: chipBackground,
-          opacity: pressed ? 0.7 : 1,
-        },
-      ]}
-    >
-      <Text
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         style={[
-          styles.chipText,
+          styles.chip,
           {
-            color: textColor,
-            fontWeight: selected ? "700" : "600",
+            backgroundColor: chipBackground,
           },
         ]}
       >
-        {label}
-      </Text>
-    </Pressable>
+        <Text
+          style={[
+            styles.chipText,
+            {
+              color: textColor,
+              fontWeight: selected ? "700" : "600",
+            },
+          ]}
+        >
+          {label}
+        </Text>
+      </Pressable>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   chip: {
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     marginRight: 8,
     marginBottom: 8,
   },
